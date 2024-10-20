@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Environment Variables
+.env
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# Ignore specific test coverage reports
+coverage/
+
+# Ignore Editor directories and files
+.vscode/
+.idea/
+.DS_Store
+
+# Ignore operating system files
+Thumbs.db

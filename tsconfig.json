@@ -9,6 +9,7 @@
         "@config/*" : ["config/*"],
         "@security/*" : ["security/*"],
         "@logger/*" : ["logger/*"],
+        "@docs/*" : ["docs/*"],
       },                                     
       "types": ["node"],                                     
       "forceConsistentCasingInFileNames": true,           

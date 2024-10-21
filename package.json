@@ -8,7 +8,7 @@
     "lint": "eslint --fix",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
-    "dev": "nodemon --watch src --exec ts-node -r tsconfig-paths/register src/index.ts"
+    "dev": "nodemon --watch src --ext ts,json,yaml --exec ts-node -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,8 @@
     "helmet": "^8.0.0",
     "hpp": "^0.2.3",
     "morgan": "^1.10.0",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -30,6 +32,8 @@
     "@types/hpp": "^0.2.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.7.7",
+    "@types/swagger-ui-express": "^4.1.6",
+    "@types/yamljs": "^0.2.34",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
     "@typescript-eslint/parser": "^8.10.0",
     "eslint": "^9.13.0",

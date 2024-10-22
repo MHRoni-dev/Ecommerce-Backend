@@ -3,6 +3,8 @@ import security from '@security/index';
 import config from '@config/index';
 import logger from '@logger/index';
 import documentation from '@docs/index';
+import connectDatabase from '@app/database';
+import { handleError } from '@error/index';
 
 const app = express();
 
@@ -11,6 +13,8 @@ app.use(security);
 
 //apply logger
 app.use(logger);
+
+app.use(express.json());
 
 //if anyone check at root level
 app.get('/', (req: Request, res: Response) => {
@@ -33,8 +37,19 @@ app.get('/health', (req: Request, res: Response) => {
 //serve api documentation
 app.use('/docs', ...documentation);
 
-app.listen(config.PORT, () => {
-  console.log(
-    `Server is running ✅ \nport: ${config.PORT} \nenvironment: ${config.NODE_ENV} `,
-  );
-});
+// routes
+
+// global error Handler
+app.use(handleError);
+
+async function startApp() {
+  await connectDatabase(config.DATABASE);
+  console.log('............\nStarting server..');
+  app.listen(config.PORT, () => {
+    console.log(
+      `Server is running ✅ \nport: ${config.PORT} \nenvironment: ${config.NODE_ENV} `,
+    );
+  });
+}
+
+startApp();

@@ -10,6 +10,7 @@
         "@security/*" : ["security/*"],
         "@logger/*" : ["logger/*"],
         "@docs/*" : ["docs/*"],
+        "@error/*" : ["error/*"],
       },                                     
       "types": ["node"],                                     
       "forceConsistentCasingInFileNames": true,           

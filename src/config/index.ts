@@ -30,6 +30,13 @@ const envSchema = z.object({
       .refine((val) => !isNaN(val), { message: 'REQ_LIMIT must be a Number' })
       .default('3000000'),
   }),
+
+  DATABASE: z.object({
+    USER: z.string(),
+    PASS: z.string(),
+    URL: z.string().url(),
+    DB_NAME: z.string(),
+  }),
 });
 
 //! make sure to add any env variable for checking
@@ -42,6 +49,12 @@ const env = envSchema.safeParse({
   SECURITY: {
     REQ_LIMIT: process.env.REQ_LIMIT,
     TIME_FRAME: process.env.REQ_TIMEFRAME,
+  },
+  DATABASE: {
+    USER: process.env.DATABASE_USER,
+    PASS: process.env.DATABASE_PASS,
+    URL: process.env.DATABASE_URL,
+    DB_NAME: process.env.DATABASE_NAME,
   },
 });
 

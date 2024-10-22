@@ -11,6 +11,7 @@
         "@logger/*" : ["logger/*"],
         "@docs/*" : ["docs/*"],
         "@error/*" : ["error/*"],
+        "@v1/*": ["app/v1/*"],
       },                                     
       "types": ["node"],                                     
       "forceConsistentCasingInFileNames": true,           

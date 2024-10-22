@@ -1,0 +1,140 @@
+# Product V1 Docs
+openapi: '3.0.3'
+info: 
+  title: Product route documentation
+  version: 1.0.0
+paths:
+  /product/create:
+    post:
+      summary: create a new Product
+      description: This endpoint is used to create a new product in the system.
+      requestBody:
+        description: Product data to create
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/ProductCreateInput'
+            examples:
+              example01:
+                $ref: '#/components/examples/ProductCreateDefaultExample'
+              example02:
+                $ref: '#/components/examples/ProductCreateTshirExample'
+                
+      responses:
+        '201':
+          description: Product created successfully
+          content: 
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status: 
+                    type: string  
+                  message:
+                    type: string 
+                  product: 
+                    $ref: '#/components/schemas/ProductResponse' 
+
+        '400':
+          description: Validation Error or Invalid Input
+          content: 
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ZodValidationError'
+                  - $ref: '#/components/schemas/HttpError'
+
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+components:
+  schemas:
+  # Product Input Schemas
+    ProductCreateInput: 
+      type: object 
+      required: 
+        - title 
+        - price
+      properties:
+        title:
+          type: string 
+        price:
+          type: number
+    
+  # Product Response Schemas
+    ProductResponse:
+      type: object 
+      properties:
+        _id:
+          type: string
+          format: uuid 
+        title:
+          type: string 
+        price:
+          type: number 
+        ratting: 
+          type: object 
+          properties:
+            count:
+              type: number 
+            rate:
+              type: number 
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string 
+          format: date-time
+
+  # Error Schemas
+    ZodValidationError:
+      type: object 
+      properties:
+        status:
+          type: string 
+          default: fail
+        message: 
+          type: string
+          default: Validation Error
+        errors: 
+          type: array
+          items:
+            type: string
+            default: error messages
+    HttpError:
+      type: object
+      properties:
+        status: 
+          type: string
+          default: fail
+        message: 
+          type: string
+          example: error message
+    ServerError:
+      type: object 
+      properties:
+        status: 
+          type: string
+          default: fail 
+        message: 
+          type: string 
+          default: something went wrong!
+
+
+  examples:
+  # Product Create Example
+    ProductCreateDefaultExample:
+      summary: A default product 
+      value:
+        title: Default Value 
+        price: 100
+    ProductCreateTshirExample:
+      summary: A sample TShirt prodcut 
+      value:
+        title: Tshirt 
+        price: 500

@@ -58,3 +58,22 @@ export async function createProduct(
     next(error);
   }
 }
+
+export async function readAllProduct(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const products = await Product.find({});
+
+    res.status(200).json({
+      status: 'success',
+      message:
+        products.length > 0 ? 'Product found Successfully' : 'No Product found',
+      products: products,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

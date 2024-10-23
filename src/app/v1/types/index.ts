@@ -15,7 +15,7 @@ export type IProductUpdate = {
 };
 
 export type IProductRedirect = {
-  prodcutId: string;
+  productId: string;
   slug: string;
 };
 

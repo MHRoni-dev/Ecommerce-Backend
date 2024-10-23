@@ -99,7 +99,7 @@ export async function readProductBySlug(
     if (!product) {
       const slugHistory = await ProductRedirect.findOne({ slug: slug });
       if (slugHistory) {
-        product = await Product.findById(slugHistory.prodcutId);
+        product = await Product.findById(slugHistory.productId);
       }
     }
 
@@ -165,7 +165,7 @@ export async function updateProductBySlug(
         session,
         new: true,
       });
-      await registerNewSlug(exist?._id, productData.slug, { session });
+      await registerNewSlug(exist?._id, exist.slug, { session });
 
       await session.commitTransaction();
     } catch (error) {
@@ -207,7 +207,7 @@ export async function deleteProductBySlug(
     try {
       product = await Product.findOneAndDelete({ slug }, { session });
       await ProductRedirect.deleteMany(
-        { prodcutId: product?._id },
+        { productId: product?._id },
         { session },
       );
       await session.commitTransaction();

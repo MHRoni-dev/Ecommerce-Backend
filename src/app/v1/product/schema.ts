@@ -14,3 +14,12 @@ export const productDataZodSchema = productInputZodSchema.extend({
     rate: z.number().min(0).max(5).default(0),
   }),
 });
+
+export const productUpdateInputZodSchema = z
+  .object({
+    title: z.string().trim().optional(),
+    price: z.number().positive().optional(),
+  })
+  .strip();
+
+export type ProductUpdateInput = z.infer<typeof productUpdateInputZodSchema>;

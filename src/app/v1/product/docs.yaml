@@ -61,7 +61,7 @@ paths:
 
       responses:
         '200' : 
-            description: Read successful 
+            description: Read successfully
             content:
               application/json:
                 schema:
@@ -84,6 +84,45 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ServerError'
+
+  /product/read/{slug}:
+    get: 
+      tags: 
+        - Product 
+      summary: Read Product with Slug 
+      description: This endpoint is to read Product by generated slug 
+      parameters:
+        - name: slug 
+          in: path 
+          required: true 
+          description: unique slug of the product
+          schema:
+            type: string 
+          example: this-is-the-1st-product-r
+      responses:
+        '200' : 
+            description: Read successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: success 
+                    message: 
+                      type: string
+                      default: 
+                          'Product found Successfully'
+                    product: 
+                      $ref: '#/components/schemas/ProductResponse'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
             
                         
 components:

@@ -18,11 +18,10 @@ export const generateNewSlug = async (text: string): Promise<string> => {
 };
 
 export const registerNewSlug = async (
-  oldSlug: string,
-  newSlug: string,
+  prodcutId: string,
+  slug: string,
   opt?: object,
 ): Promise<boolean> => {
-  console.log(oldSlug, newSlug);
-  const updatedSlug = await ProductRedirect.create([{ oldSlug, newSlug }], opt);
+  const updatedSlug = await ProductRedirect.create([{ prodcutId, slug }], opt);
   return !!updatedSlug;
 };

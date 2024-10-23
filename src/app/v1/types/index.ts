@@ -1,7 +1,8 @@
 import z from 'zod';
 import { productDataZodSchema } from '@v1/product/schema';
 
-export type IProduct = z.infer<typeof productDataZodSchema>;
+export type IProductCreate = z.infer<typeof productDataZodSchema>;
+export type IProduct = IProductCreate & MongooseDocument;
 
 export type IProductUpdate = {
   title?: string;
@@ -14,6 +15,12 @@ export type IProductUpdate = {
 };
 
 export type IProductRedirect = {
-  oldSlug: string;
-  newSlug: string;
+  prodcutId: string;
+  slug: string;
+};
+
+type MongooseDocument = {
+  _id: string;
+  createdAt: Date;
+  updatedAt: Date;
 };

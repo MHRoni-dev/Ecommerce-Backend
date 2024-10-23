@@ -1,11 +1,10 @@
 # Product V1 Docs
-openapi: '3.0.3'
-info: 
-  title: Product route documentation
-  version: 1.0.0
+
 paths:
   /product/create:
     post:
+      tags:
+        - Product
       summary: create a new Product
       description: This endpoint is used to create a new product in the system.
       requestBody:

@@ -1,5 +1,5 @@
 import { IProductRedirect } from './../types/index';
-import { Schema, model, Model, Document } from 'mongoose';
+import { Schema, model, Model, Document, Types } from 'mongoose';
 import { IProduct } from '@v1/types';
 
 const rattingSchema = new Schema(
@@ -48,11 +48,12 @@ export const Product: Model<IProduct & Document> = model<IProduct & Document>(
 
 const productRedirect = new Schema(
   {
-    oldSlug: {
-      type: String,
+    productId: {
+      type: Types.ObjectId,
+      ref: 'Product',
       required: true,
     },
-    newSlug: {
+    slug: {
       type: String,
       required: true,
     },

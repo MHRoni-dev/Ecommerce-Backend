@@ -115,13 +115,12 @@ paths:
                       default: 
                           'Product found Successfully'
                     product: 
-                      $ref: '#/components/schemas/ProductResponse'
+                      $ref: '#/components/schemas/ProductResponse'  
+        '404' :
+          $ref: '#/components/responses/ProductNotFound'
+        
         '500':
-          description: Server Error
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/ServerError'
+          $ref: '#/components/responses/InternalServerError'
 
   /product/update/{slug}:
     put: 
@@ -179,8 +178,29 @@ paths:
                           'Product Updated Successfully'
                     product: 
                       $ref: '#/components/schemas/ProductResponse''200' 
-        '404':  
-            description: Product not found
+        '404' :
+          $ref: '#/components/responses/ProductNotFound'
+        
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /product/delete/{slug}:
+    delete: 
+      tags: 
+        - Product 
+      summary: Delete Product with Slug 
+      description: This endpoint is to delete Product by generated slug 
+      parameters:
+        - name: slug 
+          in: path 
+          required: true 
+          description: unique slug of the product
+          schema:
+            type: string 
+          example: this-is-the-1st-product-r
+      responses:
+        '200' : 
+            description: Deleted successfully
             content:
               application/json:
                 schema:
@@ -188,19 +208,20 @@ paths:
                   properties:
                     status: 
                       type: string 
-                      default: fail 
+                      default: success 
                     message: 
                       type: string
                       default: 
-                          'Product not found'
+                          'Product deleted Successfully'
+                    product: 
+                      $ref: '#/components/schemas/ProductResponse'
+        '404' :
+          $ref: '#/components/responses/ProductNotFound'
+        
         '500':
-          description: Server Error
-          content:
-            application/json:
-              schema: 
-                $ref: '#/components/schemas/ServerError'
-
-                        
+          $ref: '#/components/responses/InternalServerError'
+          
+                    
 components:
   schemas:
   # Product Input Schemas
@@ -275,8 +296,7 @@ components:
         message: 
           type: string 
           default: something went wrong!
-
-
+  
   examples:
   # Product Create Example
     ProductCreateDefaultExample:
@@ -303,5 +323,26 @@ components:
           updatedAt: "2024-10-23T04:28:48.548Z"
 
 
-
-
+  responses:
+    ProductNotFound:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: fail 
+                    message: 
+                      type: string
+                      default: 
+                          'Product not found'
+                    product: 
+                      $ref: '#/components/schemas/ProductResponse'
+    InternalServerError:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/ServerError'

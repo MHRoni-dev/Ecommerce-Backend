@@ -7,8 +7,8 @@ import {
   productUpdateInputZodSchema,
 } from '@v1/product/schema';
 import createHttpError from 'http-errors';
-import { IProduct, IProductUpdate } from '@v1/types';
-import { Product } from '@v1/product/model';
+import { IProduct, IProductCreate, IProductUpdate } from '@v1/types';
+import { Product, ProductRedirect } from '@v1/product/model';
 import { generateNewSlug, registerNewSlug } from '@v1/product/lib';
 import mongoose from 'mongoose';
 
@@ -44,7 +44,7 @@ export async function createProduct(
     } while (exist);
 
     // create product
-    const product: IProduct = {
+    const product: IProductCreate = {
       ...productInput,
       slug,
       ratting: {
@@ -93,12 +93,20 @@ export async function readProductBySlug(
   try {
     const slug: string = req.params.slug;
 
-    const product: object | null = await Product.findOne({ slug });
+    let product: object | null = await Product.findOne({ slug });
+
+    // check if the product slug is changed and find the product
+    if (!product) {
+      const slugHistory = await ProductRedirect.findOne({ slug: slug });
+      if (slugHistory) {
+        product = await Product.findById(slugHistory.prodcutId);
+      }
+    }
 
     res.status(200).json({
       status: 'success',
       message: product ? 'Product found Successfully' : 'No Product found',
-      products: product,
+      product: product,
     });
   } catch (error) {
     next(error);
@@ -120,7 +128,7 @@ export async function updateProductBySlug(
 
     // search if product exist
     const slug: string = req.params.slug;
-    const exist = await Product.findOne({ slug });
+    const exist: IProduct | null = await Product.findOne({ slug });
     if (!exist) {
       throw createHttpError.NotFound('Product not found');
     }
@@ -157,7 +165,7 @@ export async function updateProductBySlug(
         session,
         new: true,
       });
-      await registerNewSlug(exist.slug, productData.slug, { session });
+      await registerNewSlug(exist?._id, productData.slug, { session });
 
       await session.commitTransaction();
     } catch (error) {
@@ -173,6 +181,48 @@ export async function updateProductBySlug(
       status: 'success',
       message: 'Product updated Successfully',
       product: updatedProduct,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteProductBySlug(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const slug: string = req.params.slug;
+
+    let product: IProduct | null = await Product.findOne({ slug });
+
+    // check if the product is valid or not
+    if (!product) {
+      throw createHttpError.NotFound('Product not found');
+    }
+    //delete process
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      product = await Product.findOneAndDelete({ slug }, { session });
+      await ProductRedirect.deleteMany(
+        { prodcutId: product?._id },
+        { session },
+      );
+      await session.commitTransaction();
+    } catch (error) {
+      console.log('Product and ProductRedirect record delete failed: ', error);
+      await session.abortTransaction();
+      throw createHttpError.InternalServerError('something went wrong');
+    } finally {
+      await session.endSession();
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Product deleted Successfully',
+      product: product,
     });
   } catch (error) {
     next(error);

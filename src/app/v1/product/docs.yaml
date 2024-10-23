@@ -123,7 +123,83 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ServerError'
 
-            
+  /product/update/{slug}:
+    put: 
+      tags:
+        - Product 
+      summary: Update Product with slug 
+      description: This endpoint is used to update existing product with slug 
+      parameters: 
+        - name: slug 
+          in: path 
+          required: true 
+          description: unique slug of the product 
+          schema: 
+            type: string 
+          example: this-is-the-1st-product-eikb
+      requestBody:
+        description: Product information that you want to update
+        required: true 
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                title: 
+                  type: string 
+                price: 
+                  type: number 
+            examples: 
+              example01: 
+                summary: Set product price to 10000 
+                value: 
+                  price: 10000
+              example02:
+                summary: set prodcut price to 50
+                value:
+                  price: 50
+              example03: 
+                summary: change product title to Pants 
+                value: 
+                  title: New Jeans Pant
+      responses:
+        '200' : 
+            description: Updated successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: success 
+                    message: 
+                      type: string
+                      default: 
+                          'Product Updated Successfully'
+                    product: 
+                      $ref: '#/components/schemas/ProductResponse''200' 
+        '404':  
+            description: Product not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: fail 
+                    message: 
+                      type: string
+                      default: 
+                          'Product not found'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
                         
 components:
   schemas:

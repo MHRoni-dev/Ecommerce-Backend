@@ -8,7 +8,7 @@ import {
 } from '@v1/product/schema';
 import createHttpError from 'http-errors';
 import { IProduct, IProductUpdate } from '@v1/types';
-import { Product } from '@v1/product/model';
+import { Product, ProductRedirect } from '@v1/product/model';
 import { generateNewSlug, registerNewSlug } from '@v1/product/lib';
 import mongoose from 'mongoose';
 
@@ -93,12 +93,20 @@ export async function readProductBySlug(
   try {
     const slug: string = req.params.slug;
 
-    const product: object | null = await Product.findOne({ slug });
+    let product: object | null = await Product.findOne({ slug });
+
+    // check if the product slug is changed and rediredct accordignly
+    if (!product) {
+      const slugHistory = await ProductRedirect.findOne({ oldSlug: slug });
+      if (slugHistory) {
+        return res.redirect(`${req.hostname}/../${slugHistory?.newSlug}`);
+      }
+    }
 
     res.status(200).json({
       status: 'success',
       message: product ? 'Product found Successfully' : 'No Product found',
-      products: product,
+      product: product,
     });
   } catch (error) {
     next(error);

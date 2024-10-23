@@ -177,7 +177,7 @@ paths:
                       default: 
                           'Product Updated Successfully'
                     product: 
-                      $ref: '#/components/schemas/ProductResponse''200' 
+                      $ref: '#/components/schemas/ProductResponse'
         '404' :
           $ref: '#/components/responses/ProductNotFound'
         

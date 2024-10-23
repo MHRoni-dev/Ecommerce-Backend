@@ -186,3 +186,30 @@ export async function updateProductBySlug(
     next(error);
   }
 }
+
+export async function deleteProductBySlug(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const slug: string = req.params.slug;
+
+    let product: object | null = await Product.findOne({ slug });
+
+    // check if the product is valid or not
+    if (!product) {
+      throw createHttpError.NotFound('Product not found');
+    }
+    //delete process
+    product = await Product.findOneAndDelete({ slug });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Product deleted Successfully',
+      product: product,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

@@ -7,5 +7,6 @@ productRoutes.post('/create', controller.createProduct);
 productRoutes.get('/read', controller.readAllProduct);
 productRoutes.get('/read/:slug', controller.readProductBySlug);
 productRoutes.put('/update/:slug', controller.updateProductBySlug);
+productRoutes.delete('/delete/:slug', controller.deleteProductBySlug);
 
 export default productRoutes;

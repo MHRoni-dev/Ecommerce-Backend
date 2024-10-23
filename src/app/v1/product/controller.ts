@@ -1,9 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { createSlug } from '@v1/lib/slug';
-import { ProductInput, productInputZodSchema } from '@v1/product/schema';
+import {
+  ProductInput,
+  productInputZodSchema,
+  ProductUpdateInput,
+  productUpdateInputZodSchema,
+} from '@v1/product/schema';
 import createHttpError from 'http-errors';
-import { IProduct } from '@v1/types';
+import { IProduct, IProductUpdate } from '@v1/types';
 import { Product } from '@v1/product/model';
+import { generateNewSlug, registerNewSlug } from '@v1/product/lib';
+import mongoose from 'mongoose';
 
 export async function createProduct(
   req: Request,
@@ -92,6 +99,80 @@ export async function readProductBySlug(
       status: 'success',
       message: product ? 'Product found Successfully' : 'No Product found',
       products: product,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateProductBySlug(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    // validate product data input
+    const input = await productUpdateInputZodSchema.safeParseAsync(req.body);
+    if (!input.success) {
+      throw input.error;
+    }
+    const productInput: ProductUpdateInput = input.data;
+
+    // search if product exist
+    const slug: string = req.params.slug;
+    const exist = await Product.findOne({ slug });
+    if (!exist) {
+      throw createHttpError.NotFound('Product not found');
+    }
+
+    const productData: IProductUpdate = { ...productInput };
+    let updatedProduct: IProduct | null = null;
+
+    // check if title need change, if title need change we need to do more work
+    productInput.title =
+      productInput.title === exist.title ? undefined : productInput.title;
+    if (!productInput.title) {
+      const updatedProduct: IProduct | null = await Product.findOneAndUpdate(
+        { slug },
+        { ...productData },
+        { new: true },
+      );
+      // response
+      return res.status(200).json({
+        status: 'success',
+        message: 'Product updated Successfully',
+        product: updatedProduct,
+      });
+    }
+
+    // as title exist ,we need to generate and update slug
+    productData.slug = await generateNewSlug(productInput.title);
+
+    // update slug and register change in the ProductRedirect
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      updatedProduct = await Product.findOneAndUpdate({ slug }, productData, {
+        session,
+        new: true,
+      });
+      await registerNewSlug(exist.slug, productData.slug, { session });
+
+      await session.commitTransaction();
+    } catch (error) {
+      console.log('Product slug update transaction faild', error);
+      await session.abortTransaction();
+      throw createHttpError.InternalServerError('Something went wrong!');
+    } finally {
+      await session.endSession();
+    }
+
+    // response
+    return res.status(200).json({
+      status: 'success',
+      message: 'Product updated Successfully',
+      product: updatedProduct,
     });
   } catch (error) {
     next(error);

@@ -1,3 +1,4 @@
+import { IProductRedirect } from './../types/index';
 import { Schema, model, Model, Document } from 'mongoose';
 import { IProduct } from '@v1/types';
 
@@ -44,3 +45,24 @@ export const Product: Model<IProduct & Document> = model<IProduct & Document>(
   'product',
   product,
 );
+
+const productRedirect = new Schema(
+  {
+    oldSlug: {
+      type: String,
+      required: true,
+    },
+    newSlug: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  },
+);
+
+export const ProductRedirect: Model<IProductRedirect & Document> = model<
+  IProductRedirect & Document
+>('productRedirect', productRedirect);

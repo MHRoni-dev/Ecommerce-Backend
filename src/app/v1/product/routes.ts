@@ -5,5 +5,6 @@ const productRoutes: Router = Router();
 
 productRoutes.post('/create', controller.createProduct);
 productRoutes.get('/read', controller.readAllProduct);
+productRoutes.get('/read/:slug', controller.readProductBySlug);
 
 export default productRoutes;

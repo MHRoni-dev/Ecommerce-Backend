@@ -77,3 +77,23 @@ export async function readAllProduct(
     next(error);
   }
 }
+
+export async function readProductBySlug(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const slug: string = req.params.slug;
+
+    const product: object | null = await Product.findOne({ slug });
+
+    res.status(200).json({
+      status: 'success',
+      message: product ? 'Product found Successfully' : 'No Product found',
+      products: product,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

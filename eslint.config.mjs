@@ -12,6 +12,9 @@ export default [
       parser: tsParser,
       globals: globals.node,
     },
+    env: {
+      jest: true
+    },
     plugins: {
       '@typescript-eslint': tseslint,
       prettier: prettierPlugin,

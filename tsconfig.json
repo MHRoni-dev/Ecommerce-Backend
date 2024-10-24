@@ -5,20 +5,22 @@
       "esModuleInterop": true,                              
       "baseUrl": "./src",                                 
       "paths": {
+        "@src/*": ["/*"],
         "@app/*" : ["app/*"],
         "@config/*" : ["config/*"],
         "@security/*" : ["security/*"],
         "@logger/*" : ["logger/*"],
         "@docs/*" : ["docs/*"],
         "@error/*" : ["error/*"],
-        "@v1/*": ["app/v1/*"],
+        "@v1/*": ["app/v1/*"]
       },                                     
-      "types": ["node"],                                     
+      "types": ["node", "jest"],                                     
       "forceConsistentCasingInFileNames": true,           
       "strict": true,                                     
       "skipLibCheck": true,
       "outDir": "./dist"                               
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["test", "node_modules", "dist"]
   }
   

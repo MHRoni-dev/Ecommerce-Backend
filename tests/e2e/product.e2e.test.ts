@@ -1,8 +1,8 @@
+import { IProduct } from '@v1/types';
 import request from 'supertest';
 import { connectDB, clearDB, disconnectDB } from '@e2e/utils/setup';
 import app from '@src/app';
 import { newValidProductData, validUpdateProductData } from '@e2e/__fixtures__/productData';
-import { IProduct } from '@src/app/v1/types';
 
 
 
@@ -21,13 +21,18 @@ afterAll( async () => {
 
 describe('Product E2E test', () => {
   
-  describe('test with valid Input', () => {
   let productId: string;  
   let currentSlug: string;
   let slugList: string[] = [];
   let currentProduct: IProduct;
 
-  
+  /* test 01
+    - /create
+    - /read/:slug
+    - /update/:slug
+    - /delete/:slug
+  */
+  describe('test with valid Input', () => {
   
   it('should create a new product', async () => {
     const res = await request(app)
@@ -117,34 +122,7 @@ describe('Product E2E test', () => {
       expect(res.body.product).toHaveProperty('title', currentProduct.title)
       expect(res.body.product).toHaveProperty('price', currentProduct.price)
     }
-  })
-
-  it('should not let update with the oldSlug', async () => {
-    // update test
-    
-    for (let slug of slugList) {
-      
-      const res = await request(app)
-        .put(`/api/v1/product/update/${slug}`)
-        .send({ price : Math.floor(Math.random()) * 400 + 1})
-
-      expect(res.status).toBe(404)
-
-    }
-
-    
-  })
-
-  it('should not delete with oldSlug', async () => {
-    
-    for (let slug of slugList) {
-      const res = await request(app)
-        .delete(`/api/v1/product/delete/${slug}`)
-
-      expect(res.status).toBe(404)
-    }
-
-  })
+  }, 10000)
 
   it('should delete product with currentSlug', async () => {
     //delete phase
@@ -167,6 +145,93 @@ describe('Product E2E test', () => {
 
   })
 
+
  })
+ //! depend on test 01, don't change sequence
+ describe('test with invalid Input', () => {
+
+  it('should not let update with the oldSlug', async () => {
+    // update test
+    
+    for (let slug of slugList) {
+      
+      const res = await request(app)
+        .put(`/api/v1/product/update/${slug}`)
+        .send({ price : Math.floor(Math.random()) * 400 + 1})
+
+      expect(res.status).toBe(404)
+
+    }
+
+    
+  },10000)
+
+  it('should not delete with oldSlug', async () => {
+    
+    for (let slug of slugList) {
+      const res = await request(app)
+        .delete(`/api/v1/product/delete/${slug}`)
+
+      expect(res.status).toBe(404)
+    }
+
+  },10000)
+
+ })
+
+ /*test
+  - /read
+ */
+ describe('test read route', () => {
+  const slugList : string[] = []
+
+    it('should read all createdProduct', async () => {
+      await clearDB();
+      //create product
+      const productCount = 10
+      for (let i = 0; i < productCount; i++) {
+        const res = await request(app)
+          .post('/api/v1/product/create')
+          .send({
+            title: `Test Product No ${i + 1}`,
+            price: (i + 1) * 400
+          })
+        
+        expect(res.status).toBe(201)
+        slugList.push(res.body.product.slug)
+      }
+     
+      const res = await request(app)
+        .get('/api/v1/product/read')
+
+      expect(res.status).toBe(200)
+      expect(res.body.products).toBeInstanceOf(Array)
+      expect(res.body.products).toHaveLength(productCount)
+      res.body.products.forEach((product: IProduct )=> {
+        expect(product).toHaveProperty('_id')
+        expect(product).toHaveProperty('slug')
+        expect(product).toHaveProperty('title')
+      });
+    
+    }, 10000)
+
+    it('when no product in system', async () => {
+      for (let slug of slugList) {
+        const res = await request(app)
+          .delete(`/api/v1/product/delete/${slug}`)
+        
+        expect(res.status).toBe(200)
+      }
+
+      const res = await request(app)
+        .get('/api/v1/product/read')
+
+      expect(res.status).toBe(200)
+      expect(res.body.products).toBeInstanceOf(Array)
+      expect(res.body.products).toHaveLength(0)
+    }, 10000)
+ })
+
+
   
 })

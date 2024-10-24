@@ -61,6 +61,9 @@ export async function createProduct(
       message: 'Product created Successfully',
       product: createdProduct,
     });
+
+    //end of function
+    return;
   } catch (error) {
     next(error);
   }
@@ -80,6 +83,9 @@ export async function readAllProduct(
         products.length > 0 ? 'Product found Successfully' : 'No Product found',
       products: products,
     });
+
+    //end of function
+    return;
   } catch (error) {
     next(error);
   }
@@ -108,6 +114,9 @@ export async function readProductBySlug(
       message: product ? 'Product found Successfully' : 'No Product found',
       product: product,
     });
+
+    //end of function
+    return;
   } catch (error) {
     next(error);
   }
@@ -145,12 +154,13 @@ export async function updateProductBySlug(
         { ...productData },
         { new: true },
       );
-      // response
-      return res.status(200).json({
+      // response and return from function
+       res.status(200).json({
         status: 'success',
         message: 'Product updated Successfully',
         product: updatedProduct,
       });
+      return;
     }
 
     // as title exist ,we need to generate and update slug
@@ -177,11 +187,14 @@ export async function updateProductBySlug(
     }
 
     // response
-    return res.status(200).json({
+    res.status(200).json({
       status: 'success',
       message: 'Product updated Successfully',
       product: updatedProduct,
     });
+
+    //end of function
+    return;
   } catch (error) {
     next(error);
   }
@@ -224,6 +237,9 @@ export async function deleteProductBySlug(
       message: 'Product deleted Successfully',
       product: product,
     });
+
+    //end of function
+    return;
   } catch (error) {
     next(error);
   }

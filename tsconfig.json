@@ -3,24 +3,27 @@
       "target": "es2016",                                 
       "module": "commonjs", 
       "esModuleInterop": true,                              
-      "baseUrl": "./src",                                 
+      "baseUrl": ".",                                 
       "paths": {
-        "@src/*": ["/*"],
-        "@app/*" : ["app/*"],
-        "@config/*" : ["config/*"],
-        "@security/*" : ["security/*"],
-        "@logger/*" : ["logger/*"],
-        "@docs/*" : ["docs/*"],
-        "@error/*" : ["error/*"],
-        "@v1/*": ["app/v1/*"]
+        "@src/*": ["src/*"],
+        "@tests/*": ["tests/*"],
+        "@e2e/*": ["tests/e2e/*"],
+        "@app/*" : ["src/app/*"],
+        "@config/*" : ["src/config/*"],
+        "@security/*" : ["src/security/*"],
+        "@logger/*" : ["src/logger/*"],
+        "@docs/*" : ["src/docs/*"],
+        "@error/*" : ["src/error/*"],
+        "@v1/*": ["src/app/v1/*"]
       },                                     
       "types": ["node", "jest"],                                     
       "forceConsistentCasingInFileNames": true,           
-      "strict": true,                                     
+      "strict": true,      
+      "resolveJsonModule": true,                               
       "skipLibCheck": true,
       "outDir": "./dist"                               
     },
-    "include": ["src/**/*"],
-    "exclude": ["test", "node_modules", "dist"]
+    "include": ["src/**/*", "tests/**/*"],
+    "exclude": [ "node_modules", "dist"]
   }
   

@@ -108,10 +108,14 @@ export async function readProductBySlug(
         product = await Product.findById(slugHistory.productId);
       }
     }
+    // if still not found
+    if( !product ) {
+      throw createHttpError.NotFound('Product not found')
+    }
 
     res.status(200).json({
       status: 'success',
-      message: product ? 'Product found Successfully' : 'No Product found',
+      message: 'Product found Successfully',
       product: product,
     });
 

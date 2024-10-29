@@ -1,6 +1,6 @@
-import { IProductRedirect } from './../types/index';
-import { Schema, model, Model, Document, Types } from 'mongoose';
-import { IProduct } from '@v1/types';
+import { ProductRedirect } from './../types/index';
+import { Schema, model, Model, Types } from 'mongoose';
+import { Product } from '@v1/types';
 
 const rattingSchema = new Schema(
   {
@@ -41,10 +41,7 @@ const product = new Schema(
   { versionKey: false, timestamps: true },
 );
 
-export const Product: Model<IProduct & Document> = model<IProduct & Document>(
-  'product',
-  product,
-);
+export const ProductModel: Model<Product> = model<Product>('product', product);
 
 const productRedirect = new Schema(
   {
@@ -64,6 +61,5 @@ const productRedirect = new Schema(
   },
 );
 
-export const ProductRedirect: Model<IProductRedirect & Document> = model<
-  IProductRedirect & Document
->('productRedirect', productRedirect);
+export const ProductRedirectModel: Model<ProductRedirect> =
+  model<ProductRedirect>('productRedirect', productRedirect);

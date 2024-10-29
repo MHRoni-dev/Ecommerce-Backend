@@ -1,14 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { createSlug } from '@v1/lib/slug';
 import {
-  ProductInput,
   productInputZodSchema,
-  ProductUpdateInput,
   productUpdateInputZodSchema,
 } from '@v1/product/schema';
 import createHttpError from 'http-errors';
-import { IProduct, IProductCreate, IProductUpdate } from '@v1/types';
-import { Product, ProductRedirect } from '@v1/product/model';
+import {
+  Product,
+  ProductCreateInput,
+  ProductUpdateInput,
+  ProductCreatePayload,
+  ProductUpdatePayload,
+  ProductRedirect,
+} from '@v1/types';
+import { ProductModel, ProductRedirectModel } from '@v1/product/model';
 import { generateNewSlug, registerNewSlug } from '@v1/product/lib';
 import mongoose from 'mongoose';
 
@@ -24,7 +29,7 @@ export async function createProduct(
     if (!input.success) {
       throw input.error;
     }
-    const productInput: ProductInput = input.data;
+    const productInput: ProductCreateInput = input.data;
 
     // search and generate unique slug
     let slug: string = '',
@@ -33,7 +38,7 @@ export async function createProduct(
 
     do {
       slug = createSlug(productInput.title);
-      exist = !!(await Product.findOne({ slug }));
+      exist = !!(await ProductModel.findOne({ slug }));
       if (count-- <= 0) {
         throw createHttpError.BadRequest('try changing the product Title');
         // res.status(400).json({
@@ -44,7 +49,7 @@ export async function createProduct(
     } while (exist);
 
     // create product
-    const product: IProductCreate = {
+    const product: ProductCreatePayload = {
       ...productInput,
       slug,
       ratting: {
@@ -53,7 +58,7 @@ export async function createProduct(
       },
     };
 
-    const createdProduct = await Product.create(product);
+    const createdProduct: Product = await ProductModel.create(product);
 
     // response
     res.status(201).json({
@@ -75,7 +80,7 @@ export async function readAllProduct(
   next: NextFunction,
 ) {
   try {
-    const products = await Product.find({});
+    const products: Product[] = await ProductModel.find({});
 
     res.status(200).json({
       status: 'success',
@@ -99,18 +104,19 @@ export async function readProductBySlug(
   try {
     const slug: string = req.params.slug;
 
-    let product: object | null = await Product.findOne({ slug });
+    let product: Product | null = await ProductModel.findOne({ slug });
 
     // check if the product slug is changed and find the product
     if (!product) {
-      const slugHistory = await ProductRedirect.findOne({ slug: slug });
+      const slugHistory: ProductRedirect | null =
+        await ProductRedirectModel.findOne({ slug: slug });
       if (slugHistory) {
-        product = await Product.findById(slugHistory.productId);
+        product = await ProductModel.findById(slugHistory.productId);
       }
     }
     // if still not found
-    if( !product ) {
-      throw createHttpError.NotFound('Product not found')
+    if (!product) {
+      throw createHttpError.NotFound('Product not found');
     }
 
     res.status(200).json({
@@ -141,25 +147,26 @@ export async function updateProductBySlug(
 
     // search if product exist
     const slug: string = req.params.slug;
-    const exist: IProduct | null = await Product.findOne({ slug });
+    const exist: Product | null = await ProductModel.findOne({ slug });
     if (!exist) {
       throw createHttpError.NotFound('Product not found');
     }
 
-    const productData: IProductUpdate = { ...productInput };
-    let updatedProduct: IProduct | null = null;
+    const productData: ProductUpdatePayload = { ...productInput };
+    let updatedProduct: Product | null = null;
 
     // check if title need change, if title need change we need to do more work
     productInput.title =
       productInput.title === exist.title ? undefined : productInput.title;
     if (!productInput.title) {
-      const updatedProduct: IProduct | null = await Product.findOneAndUpdate(
-        { slug },
-        { ...productData },
-        { new: true },
-      );
+      const updatedProduct: Product | null =
+        await ProductModel.findOneAndUpdate(
+          { slug },
+          { ...productData },
+          { new: true },
+        );
       // response and return from function
-       res.status(200).json({
+      res.status(200).json({
         status: 'success',
         message: 'Product updated Successfully',
         product: updatedProduct,
@@ -175,10 +182,14 @@ export async function updateProductBySlug(
     session.startTransaction();
 
     try {
-      updatedProduct = await Product.findOneAndUpdate({ slug }, productData, {
-        session,
-        new: true,
-      });
+      updatedProduct = await ProductModel.findOneAndUpdate(
+        { slug },
+        productData,
+        {
+          session,
+          new: true,
+        },
+      );
       await registerNewSlug(exist?._id, exist.slug, { session });
 
       await session.commitTransaction();
@@ -212,7 +223,7 @@ export async function deleteProductBySlug(
   try {
     const slug: string = req.params.slug;
 
-    let product: IProduct | null = await Product.findOne({ slug });
+    let product: Product | null = await ProductModel.findOne({ slug });
 
     // check if the product is valid or not
     if (!product) {
@@ -222,8 +233,8 @@ export async function deleteProductBySlug(
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      product = await Product.findOneAndDelete({ slug }, { session });
-      await ProductRedirect.deleteMany(
+      product = await ProductModel.findOneAndDelete({ slug }, { session });
+      await ProductRedirectModel.deleteMany(
         { productId: product?._id },
         { session },
       );

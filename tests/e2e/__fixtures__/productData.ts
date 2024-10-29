@@ -1,18 +1,18 @@
-import { ProductInput } from '@src/app/v1/product/schema';
+import { ProductCreateInput, ProductUpdateInput } from '@src/app/v1/types';
 
-export const newValidProductData: ProductInput = {
+export const newValidProductData: ProductCreateInput = {
   title: 'Valid Product',
-  price: 200
-}
+  price: 200,
+};
 
-export const newInvalidProductData: any = {
+export const newInvalidProductData = {
   name: 'Test Product',
-  description: "Test Product",
+  description: 'Test Product',
   price: '200',
-  stock: '100'
-}
+  stock: '100',
+};
 
-export const validUpdateProductData: Partial<ProductInput> = {
+export const validUpdateProductData: ProductUpdateInput = {
   title: 'Updated Product',
-  price: 10
-}
+  price: 10,
+};

@@ -1,26 +1,42 @@
-import z from 'zod';
-import { productDataZodSchema } from '@v1/product/schema';
+// Product type
 
-export type IProductCreate = z.infer<typeof productDataZodSchema>;
-export type IProduct = IProductCreate & MongooseDocument;
-
-export type IProductUpdate = {
-  title?: string;
-  price?: number;
-  slug?: string;
-  ratting?: {
-    rate?: number;
-    count?: number;
-  };
-};
-
-export type IProductRedirect = {
-  productId: string;
-  slug: string;
-};
-
-type MongooseDocument = {
+export type Product = {
   _id: string;
+  title: string;
+  price: number;
+  slug: string;
+  ratting: {
+    rate: number;
+    count: number;
+  };
   createdAt: Date;
   updatedAt: Date;
 };
+
+// Product variant
+export type ProductCreatePayload = Omit<
+  Product,
+  '_id' | 'createdAt' | 'updatedAt'
+>;
+export type ProductCreateInput = Omit<ProductCreatePayload, 'slug' | 'ratting'>;
+
+export type ProductUpdatePayload = Partial<
+  Omit<Product, '_id' | 'createdAt' | 'updatedAt'>
+>;
+export type ProductUpdateInput = Omit<ProductUpdatePayload, 'slug' | 'ratting'>;
+
+// ProductRedirect type
+
+export type ProductRedirect = {
+  _id: string;
+  productId: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// ProductRedirect variant
+export type ProductRedirectInput = Omit<
+  ProductRedirect,
+  '_id' | 'createdAt' | 'updatedAt'
+>;

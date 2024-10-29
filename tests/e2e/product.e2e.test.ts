@@ -3,6 +3,7 @@ import request from 'supertest';
 import { connectDB, clearDB, disconnectDB } from '@e2e/utils/setup';
 import app from '@src/app';
 import { newValidProductData, validUpdateProductData } from '@e2e/__fixtures__/productData';
+import mongoose from 'mongoose';
 
 
 
@@ -145,6 +146,12 @@ describe('Product E2E test', () => {
 
   })
 
+  it('should not found any ProductRedirect of the deleted product', async () => {
+
+    const res = await mongoose.model('productRedirect').findOne({  })
+
+    expect(res).toBe(null)
+  } )
 
  })
  //! depend on test 01, don't change sequence

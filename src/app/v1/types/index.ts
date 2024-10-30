@@ -40,3 +40,5 @@ export type ProductRedirectInput = Omit<
   ProductRedirect,
   '_id' | 'createdAt' | 'updatedAt'
 >;
+
+export * from './categoryTypes';

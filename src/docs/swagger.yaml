@@ -8,6 +8,4 @@ servers:
   - url: https://ecommerce-backend-lxhy.onrender.com/api/v1
     description: v1 - live
 
-paths:
-  /product/create:
-    $ref: '../app/v1/product/docs.yaml#/paths/~1product~1create'
+

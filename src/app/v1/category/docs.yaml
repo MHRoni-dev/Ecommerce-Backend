@@ -1,0 +1,177 @@
+paths:
+  /category/create:
+    post: 
+      tags:
+        - Category 
+      summary: create a new Category 
+      description: This endpoint is used to create a new Category in the system. 
+      requestBody:
+        description: Category data to create 
+        required: true 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateInput'
+            examples:
+              example01:
+                $ref: '#/components/examples/CategoryCreateDefaultExample'
+              example02:
+                $ref: '#/components/examples/CategoryCreateShirtExample'
+      responses:
+        '201':
+          description: Category created successfully
+          content: 
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status: 
+                    type: string  
+                  message:
+                    type: string 
+                  product: 
+                    $ref: '#/components/schemas/CategoryResponse' 
+
+        '400':
+          description: Validation Error or Invalid Input
+          content: 
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ZodValidationError'
+                  - $ref: '#/components/schemas/HttpError'
+
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+
+
+components:
+  schemas:
+  # Category Input Schemas
+    CategoryCreateInput: 
+      type: object 
+      required: 
+        - title 
+      properties:
+        title:
+          type: string 
+          default: category title
+        description:
+          type: string
+          default: category description
+        parentCategoryId:
+          type: string
+          format: uuid
+  # Category Response Schemas
+    CategoryResponse:
+      type: object 
+      properties:
+        _id:
+          type: string
+          format: uuid 
+        title:
+          type: string 
+        description:
+          type: string 
+        slug: 
+          type: string 
+        parrentCategoryId:
+          type: string
+          format: uuid 
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string 
+          format: date-time
+
+
+
+  # Error Schemas
+    ZodValidationError:
+      type: object 
+      properties:
+        status:
+          type: string 
+          default: fail
+        message: 
+          type: string
+          default: Validation Error
+        errors: 
+          type: array
+          items:
+            type: string
+            default: error messages
+    HttpError:
+      type: object
+      properties:
+        status: 
+          type: string
+          default: fail
+        message: 
+          type: string
+          example: error message
+    ServerError:
+      type: object 
+      properties:
+        status: 
+          type: string
+          default: fail 
+        message: 
+          type: string 
+          default: something went wrong!
+  
+  examples:
+  # Category Create Example
+    CategoryCreateDefaultExample:
+      summary: A default category 
+      value:
+        title: Default Value 
+        description:: for test purpose
+    CategoryCreateShirtExample:
+      summary: A sample Shirt Category 
+      value:
+        title: Shirt 
+        description: This is shirt category
+    CategoryExample: 
+      summary: Category Example 
+      value: 
+          _id: "67187b802898a8832b15acfa"
+          title: "Tshirt"
+          slug: "tshirt-kkcp"
+          price: 500
+          ratting": 
+            count: 0
+            rate: 0
+          createdAt: "2024-10-23T04:28:48.548Z"
+          updatedAt: "2024-10-23T04:28:48.548Z"
+
+
+  responses:
+    CategoryNotFound:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: fail 
+                    message: 
+                      type: string
+                      default: 
+                          'Category not found'
+                    product: 
+                      $ref: '#/components/schemas/CategoryResponse'
+    InternalServerError:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/ServerError'

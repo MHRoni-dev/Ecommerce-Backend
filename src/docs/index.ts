@@ -1,9 +1,11 @@
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
+import _merge from 'lodash.merge';
 
 let swaggerDocument;
 let productDocs;
+let categoryDocs;
 
 try {
   // Load the main OpenAPI YAML
@@ -14,8 +16,12 @@ try {
     path.join('src', 'app', 'v1', 'product', 'docs.yaml'),
   );
 
+  categoryDocs = YAML.load(
+    path.join('src', 'app', 'v1', 'category', 'docs.yaml'),
+  );
+
   // Merge the product-specific docs into the main OpenAPI document
-  Object.assign(swaggerDocument, productDocs);
+  _merge(swaggerDocument, productDocs, categoryDocs);
 } catch (error) {
   console.error('Error loading or merging YAML files:', error);
 

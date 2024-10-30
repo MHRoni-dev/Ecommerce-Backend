@@ -4,6 +4,7 @@ import logger from '@logger/index';
 import documentation from '@docs/index';
 import { handleError } from '@error/index';
 import productRoutesV1 from '@app/v1/product/routes';
+import categoryRoutes from '@app/v1/category/routes';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/docs', ...documentation);
 
 // routes
 app.use('/api/v1/product', productRoutesV1);
+app.use('/api/v1/category', categoryRoutes);
 
 // global error Handler
 app.use(handleError);

@@ -48,6 +48,40 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ServerError'
 
+  /category/read:
+      get:
+        tags:
+          - Category 
+        summary:
+          Read All Category 
+        description: This endpoint is used to read All Category in the system 
+
+        responses:
+          '200' : 
+              description: Read successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      status: 
+                        type: string 
+                        default: success 
+                      message: 
+                        type: string
+                        default: 
+                            'Category found Successfully'
+                      categories: 
+                          type: array 
+                          items: 
+                            $ref: '#/components/schemas/CategoryResponse'
+          '500':
+            description: Server Error
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/ServerError'
+
 
 
 components:

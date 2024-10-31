@@ -120,10 +120,8 @@ describe('Category E2E Test', () => {
     );
     expect(updateRes.status).toBe(200);
     expect(updateRes.body.category).toHaveProperty('_id', category._id);
-    expect(updateRes.body.category).toHaveProperty(
-      'slug',
-      expect.not.stringMatching(category.slug),
-    );
+    expect(updateRes.body.category).toHaveProperty('slug');
+    expect(updateRes.body.category.slug).not.toBe(category.slug);
     expect(updateRes.body.category).toHaveProperty(
       'title',
       validCategoryUpdateInput.title,

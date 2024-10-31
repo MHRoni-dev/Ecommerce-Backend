@@ -37,6 +37,10 @@ async function updateCategory(slug: string, data: CategoryUpdateInput) {
   return await request(app).put(`/api/v1/category/update/${slug}`).send(data);
 }
 
+async function deleteCategory(slug: string) {
+  return await request(app).delete(`/api/v1/category/delete/${slug}`);
+}
+
 describe('Category E2E Test', () => {
   it('should create category', async () => {
     const res = await createCategory(validCategoryCreateInput);
@@ -144,5 +148,20 @@ describe('Category E2E Test', () => {
     expect(updateRes.body).toHaveProperty('status', 'fail');
     expect(updateRes.body).toHaveProperty('errors');
     expect(updateRes.body.errors).toBeInstanceOf(Array);
+  });
+
+  it('should delete category', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+    const category = res.body.category;
+
+    const deleteRes = await deleteCategory(category.slug);
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body).toHaveProperty('status', 'success');
+  });
+
+  it('should not delete category with invalid slug', async () => {
+    const res = await deleteCategory('invalid-slug');
+    expect(res.status).toBe(404);
   });
 });

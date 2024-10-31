@@ -178,6 +178,44 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /category/delete/{slug}:
+    delete: 
+      tags: 
+        - Category 
+      summary: Delete Category with Slug 
+      description: This endpoint is to delete Category by generated slug 
+      parameters:
+        - name: slug 
+          in: path 
+          required: true 
+          description: unique slug of the category
+          schema:
+            type: string 
+          example: this-is-the-1st-category
+      responses:
+        '200' : 
+            description: Deleted successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: success 
+                    message: 
+                      type: string
+                      default: 
+                          'Category deleted Successfully'
+                    category: 
+                      $ref: '#/components/schemas/CategoryResponse'
+        '404' :
+          $ref: '#/components/responses/CategoryNotFound'
+        
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+   
 
 
 components:

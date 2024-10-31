@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
 import z from 'zod';
-dotenv.config();
+dotenv.config({
+  path: `.env.${process.env.NODE_ENV || 'development'}`,
+  debug: process.env.NODE_ENV !== 'production',
+});
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -27,8 +30,15 @@ const envSchema = z.object({
     TIME_FRAME: z
       .string()
       .transform((val) => parseInt(val, 10))
-      .refine((val) => !isNaN(val), { message: 'REQ_LIMIT must be a Number' })
+      .refine((val) => !isNaN(val), { message: 'TIME_FRAME must be a Number' })
       .default('3000000'),
+    HASHING_SALT_ROUNDS: z
+      .string()
+      .transform((val) => parseInt(val, 10))
+      .refine((val) => !isNaN(val), {
+        message: 'HASHING_SALT_ROUNDS must be a Number',
+      })
+      .default('10'),
   }),
 
   DATABASE: z.object({
@@ -36,6 +46,11 @@ const envSchema = z.object({
     PASS: z.string(),
     URL: z.string().url(),
     DB_NAME: z.string(),
+  }),
+
+  JWT: z.object({
+    SECRET: z.string(),
+    EXPIRES_IN: z.string(),
   }),
 });
 
@@ -49,12 +64,17 @@ const env = envSchema.safeParse({
   SECURITY: {
     REQ_LIMIT: process.env.REQ_LIMIT,
     TIME_FRAME: process.env.REQ_TIMEFRAME,
+    HASHING_SALT_ROUNDS: process.env.HASHING_SALT_ROUNDS,
   },
   DATABASE: {
     USER: process.env.DATABASE_USER,
     PASS: process.env.DATABASE_PASS,
     URL: process.env.DATABASE_URL,
     DB_NAME: process.env.DATABASE_NAME,
+  },
+  JWT: {
+    SECRET: process.env.JWT_SECRET,
+    EXPIRES_IN: process.env.JWT_EXPIRES_IN,
   },
 });
 

@@ -7,7 +7,6 @@ import {
 import app from '@src/app';
 import request from 'supertest';
 import { Category, CategoryUpdateInput } from '@src/app/v1/types';
-import { create } from 'domain';
 
 beforeAll(async () => {
   await connectDB();
@@ -121,10 +120,8 @@ describe('Category E2E Test', () => {
     );
     expect(updateRes.status).toBe(200);
     expect(updateRes.body.category).toHaveProperty('_id', category._id);
-    expect(updateRes.body.category).toHaveProperty(
-      'slug',
-      expect.not.stringMatching(category.slug),
-    );
+    expect(updateRes.body.category).toHaveProperty('slug');
+    expect(updateRes.body.category.slug).not.toBe(category.slug);
     expect(updateRes.body.category).toHaveProperty(
       'title',
       validCategoryUpdateInput.title,

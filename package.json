@@ -8,7 +8,8 @@
     "lint": "eslint --fix",
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
-    "dev": "nodemon --watch src --ext ts,json,yaml --exec ts-node -r tsconfig-paths/register src/index.ts"
+    "dev": "nodemon --watch src --ext ts,json,yaml --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -52,7 +53,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.11.0",
+    "husky": "^9.1.6",
     "jest": "^29.7.0",
+    "lint-staged": "^15.2.10",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
     "supertest": "^7.0.0",

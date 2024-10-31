@@ -1,4 +1,3 @@
-import { create } from 'domain';
 export type User = {
   _id: string;
   email: string;

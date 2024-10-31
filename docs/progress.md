@@ -9,6 +9,14 @@ Product routes :
     - /update/:slug
     - /delete/:slug
 
+
+Category routes :
+
+    - /create
+    - /read
+    - /read/:slug
+    - /update/:slug
+
 ## ToDo
 Product routes:
 
@@ -16,8 +24,5 @@ Product routes:
 
 Category routes:
 
-    - /create
-    - /read
-    - /read/:slug
-    - /update/:slug
+
     - /delete/:slug

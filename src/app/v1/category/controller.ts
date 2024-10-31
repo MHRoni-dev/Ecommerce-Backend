@@ -1,4 +1,4 @@
-import { CategoryCreatePayload } from './../types/categoryTypes';
+import { Category, CategoryCreatePayload } from './../types/categoryTypes';
 import { NextFunction, Request, Response } from 'express';
 import { categoryCreateInputZodSchema } from '@v1/category/schema';
 import { CategoryCreateInput } from '@v1/types';
@@ -39,6 +39,30 @@ export async function createCategory(
       status: 'success',
       message: 'Category created Successfully',
       category: createdCategory,
+    });
+
+    //end of function
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function readAllCategory(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const categories: Category[] = await CategoryModel.find({});
+
+    res.status(200).json({
+      status: 'success',
+      message:
+        categories.length > 0
+          ? 'Category found Successfully'
+          : 'No Category found',
+      categories: categories,
     });
 
     //end of function

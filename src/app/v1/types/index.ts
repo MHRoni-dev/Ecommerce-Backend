@@ -42,3 +42,4 @@ export type ProductRedirectInput = Omit<
 >;
 
 export * from './categoryTypes';
+export * from './userTypes';

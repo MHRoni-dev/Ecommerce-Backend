@@ -1,0 +1,216 @@
+paths:
+  /user/register:
+    post: 
+      tags:
+        - User 
+      summary: create a new User 
+      description: This endpoint is used to create a new User in the system. 
+      requestBody:
+        description: User data to create 
+        required: true 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateInput'
+            examples:
+              example01:
+                $ref: '#/components/examples/UserJohnDoeExample'
+              example02:
+                $ref: '#/components/examples/UserTestExample'
+      responses:
+        '201':
+          description: User created successfully
+          content: 
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status: 
+                    type: string  
+                  message:
+                    type: string 
+                  user: 
+                    $ref: '#/components/schemas/UserResponse' 
+
+        '400':
+          description: Validation Error or Invalid Input
+          content: 
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ZodValidationError'
+                  - $ref: '#/components/schemas/HttpError'
+
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+  /user/login:
+    post: 
+      tags:
+        - User 
+      summary: login a User 
+      description: This endpoint is used to login a User in the system. 
+      requestBody:
+        description: User data to login 
+        required: true 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateInput'
+            examples:
+              example01:
+                $ref: '#/components/examples/UserJohnDoeExample'
+              example02:
+                $ref: '#/components/examples/UserTestExample'
+      responses:
+        '200':
+          description: User log in successfully
+          content: 
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status: 
+                    type: string  
+                  message:
+                    type: string 
+                  user: 
+                    $ref: '#/components/schemas/UserResponse'
+                  accessToken: 
+                    type: string 
+
+        '400':
+          description: Validation Error or Invalid Input
+          content: 
+             application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ZodValidationError'
+                  - $ref: '#/components/schemas/HttpError'
+
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+components:
+  schemas:
+  # User Input Schemas
+    UserCreateInput: 
+      type: object 
+      required: 
+        - email 
+        - password 
+      properties:
+        email:
+          type: string 
+          format: email
+          default: john@doe.com
+        password:
+          type: string
+          format: password
+          default: XXXXXXXX
+        
+  # User Response Schemas
+    UserResponse:
+      type: object 
+      properties:
+        _id:
+          type: string
+          format: uuid 
+        email:
+          type: string
+          format: email 
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string 
+          format: date-time
+
+
+
+  # Error Schemas
+    ZodValidationError:
+      type: object 
+      properties:
+        status:
+          type: string 
+          default: fail
+        message: 
+          type: string
+          default: Validation Error
+        errors: 
+          type: array
+          items:
+            type: string
+            default: error messages
+    HttpError:
+      type: object
+      properties:
+        status: 
+          type: string
+          default: fail
+        message: 
+          type: string
+          example: error message
+    ServerError:
+      type: object 
+      properties:
+        status: 
+          type: string
+          default: fail 
+        message: 
+          type: string 
+          default: something went wrong!
+  
+  examples:
+  # User Create Example
+    UserJohnDoeExample:
+      summary: sample john doe User 
+      value:
+        email: johndoe@doe.com
+        password: password 
+    UserTestExample:
+      summary: sample test User 
+      value:
+        email: test@mail.com
+        password: password 
+    UserExample: 
+      summary: User Example 
+      value: 
+          _id: "67187b802898a8832b15acfa"
+          email: "johndoe@doe.com"
+          createdAt: "2024-10-23T04:28:48.548Z"
+          updatedAt: "2024-10-23T04:28:48.548Z"
+
+
+  responses:
+    UserNotFound:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: fail 
+                    message: 
+                      type: string
+                      default: 
+                          'User not found'
+                    user: 
+                      $ref: '#/components/schemas/UserResponse'
+    InternalServerError:
+      description: Server Error
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/ServerError'

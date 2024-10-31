@@ -29,7 +29,7 @@ paths:
                     type: string  
                   message:
                     type: string 
-                  product: 
+                  category: 
                     $ref: '#/components/schemas/CategoryResponse' 
 
         '400':
@@ -111,8 +111,67 @@ paths:
                       type: string
                       default: 
                           'Category found Successfully'
-                    product: 
+                    category: 
                       $ref: '#/components/schemas/CategoryResponse'  
+        '404' :
+          $ref: '#/components/responses/CategoryNotFound'
+        
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /category/update/{slug}:
+    put: 
+      tags:
+        - Category 
+      summary: Update Category with slug 
+      description: This endpoint is used to update existing category with slug 
+      parameters: 
+        - name: slug 
+          in: path 
+          required: true 
+          description: unique slug of the category 
+          schema: 
+            type: string 
+          example: this-is-the-1st-category
+      requestBody:
+        description: Category information that you want to update
+        required: true 
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                title: 
+                  type: string 
+                price: 
+                  type: number 
+            examples: 
+              example01: 
+                summary: Set category title to Pants
+                value: 
+                  title: Pants
+              example02:
+                summary: set cateogry title to Shooes
+                value:
+                  title: Shooes
+              
+      responses:
+        '200' : 
+            description: Updated successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string 
+                      default: success 
+                    message: 
+                      type: string
+                      default: 
+                          'Category Updated Successfully'
+                    category: 
+                      $ref: '#/components/schemas/CategoryResponse'
         '404' :
           $ref: '#/components/responses/CategoryNotFound'
         
@@ -238,7 +297,7 @@ components:
                       type: string
                       default: 
                           'Category not found'
-                    product: 
+                    category: 
                       $ref: '#/components/schemas/CategoryResponse'
     InternalServerError:
       description: Server Error

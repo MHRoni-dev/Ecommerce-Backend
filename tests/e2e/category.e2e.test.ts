@@ -2,10 +2,11 @@ import { clearDB, connectDB, disconnectDB } from '@e2e/utils/setup';
 import {
   invalidCategoryCreateInput,
   validCategoryCreateInput,
+  validCategoryUpdateInput,
 } from '@e2e/__fixtures__/categoryData';
 import app from '@src/app';
 import request from 'supertest';
-import { Category } from '@src/app/v1/types';
+import { Category, CategoryUpdateInput } from '@src/app/v1/types';
 
 beforeAll(async () => {
   await connectDB();
@@ -29,6 +30,10 @@ async function readCategory(slug: string) {
 
 async function readCategories() {
   return await request(app).get('/api/v1/category/read');
+}
+
+async function updateCategory(slug: string, data: CategoryUpdateInput) {
+  return await request(app).put(`/api/v1/category/update/${slug}`).send(data);
 }
 
 describe('Category E2E Test', () => {
@@ -100,4 +105,41 @@ describe('Category E2E Test', () => {
     expect(res.body.categories).toHaveLength(0);
   });
 
+  it('should update category', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+    const category = res.body.category;
+
+    const updateRes = await updateCategory(
+      category.slug,
+      validCategoryUpdateInput,
+    );
+    expect(updateRes.status).toBe(200);
+    expect(updateRes.body.category).toHaveProperty('_id', category._id);
+    expect(updateRes.body.category).toHaveProperty('slug');
+    expect(updateRes.body.category.slug).not.toBe(category.slug);
+    expect(updateRes.body.category).toHaveProperty(
+      'title',
+      validCategoryUpdateInput.title,
+    );
+  });
+
+  it('should not update category with invalid slug', async () => {
+    const res = await updateCategory('invalid-slug', validCategoryUpdateInput);
+    expect(res.status).toBe(404);
+  });
+
+  it('should not update category with invalid title', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+    const category = res.body.category;
+
+    const updateRes = await updateCategory(category.slug, {
+      title: 20,
+    } as object);
+    expect(updateRes.status).toBe(400);
+    expect(updateRes.body).toHaveProperty('status', 'fail');
+    expect(updateRes.body).toHaveProperty('errors');
+    expect(updateRes.body.errors).toBeInstanceOf(Array);
+  });
 });

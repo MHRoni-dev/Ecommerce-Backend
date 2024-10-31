@@ -1,0 +1,167 @@
+import { clearDB, connectDB, disconnectDB } from '@e2e/utils/setup';
+import {
+  invalidCategoryCreateInput,
+  validCategoryCreateInput,
+  validCategoryUpdateInput,
+} from '@e2e/__fixtures__/categoryData';
+import app from '@src/app';
+import request from 'supertest';
+import { Category, CategoryUpdateInput } from '@src/app/v1/types';
+import { create } from 'domain';
+
+beforeAll(async () => {
+  await connectDB();
+});
+
+beforeEach(async () => {
+  await clearDB();
+});
+
+afterAll(async () => {
+  await disconnectDB();
+});
+
+async function createCategory(data: object) {
+  return await request(app).post('/api/v1/category/create').send(data);
+}
+
+async function readCategory(slug: string) {
+  return await request(app).get(`/api/v1/category/read/${slug}`);
+}
+
+async function readCategories() {
+  return await request(app).get('/api/v1/category/read');
+}
+
+async function updateCategory(slug: string, data: CategoryUpdateInput) {
+  return await request(app).put(`/api/v1/category/update/${slug}`).send(data);
+}
+
+async function deleteCategory(slug: string) {
+  return await request(app).delete(`/api/v1/category/delete/${slug}`);
+}
+
+describe('Category E2E Test', () => {
+  it('should create category', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+
+    expect(res.status).toBe(201);
+    expect(res.body.category).toHaveProperty('_id');
+    expect(res.body.category).toHaveProperty('slug');
+    expect(res.body.category).toHaveProperty(
+      'title',
+      validCategoryCreateInput.title,
+    );
+  });
+
+  it('should not create category', async () => {
+    const res = await createCategory(invalidCategoryCreateInput);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('status', 'fail');
+    expect(res.body).toHaveProperty('errors');
+    expect(res.body.errors).toBeInstanceOf(Array);
+  });
+
+  it('should read category with slug', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+
+    const category = res.body.category;
+    const readRes = await readCategory(category.slug);
+
+    expect(readRes.status).toBe(200);
+    expect(readRes.body.category).toHaveProperty('_id', category._id);
+    expect(readRes.body.category).toHaveProperty('slug', category.slug);
+    expect(readRes.body.category).toHaveProperty('title', category.title);
+  });
+
+  it('should not found cateogry with slug', async () => {
+    // no category created yet so no invalid-slug category exist
+    const res = await readCategory('invalid-slug');
+    expect(res.status).toBe(404);
+  });
+
+  it('should read all categories', async () => {
+    for (let i = 0; i < 5; i++) {
+      const res = await createCategory({
+        title: `Category No ${i + 1}`,
+      });
+      expect(res.status).toBe(201);
+    }
+
+    const res = await readCategories();
+    const categories = res.body.categories;
+
+    expect(res.status).toBe(200);
+    expect(categories).toBeInstanceOf(Array);
+    expect(categories).toHaveLength(5);
+    categories.forEach((category: Category) => {
+      expect(category).toHaveProperty('_id');
+      expect(category).toHaveProperty('slug');
+      expect(category).toHaveProperty('title');
+    });
+  });
+
+  it('should read empty categories', async () => {
+    const res = await readCategories();
+    expect(res.status).toBe(200);
+    expect(res.body.categories).toBeInstanceOf(Array);
+    expect(res.body.categories).toHaveLength(0);
+  });
+
+  it('should update category', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+    const category = res.body.category;
+
+    const updateRes = await updateCategory(
+      category.slug,
+      validCategoryUpdateInput,
+    );
+    expect(updateRes.status).toBe(200);
+    expect(updateRes.body.category).toHaveProperty('_id', category._id);
+    expect(updateRes.body.category).toHaveProperty(
+      'slug',
+      expect.not.stringMatching(category.slug),
+    );
+    expect(updateRes.body.category).toHaveProperty(
+      'title',
+      validCategoryUpdateInput.title,
+    );
+  });
+
+  it('should not update category with invalid slug', async () => {
+    const res = await updateCategory('invalid-slug', validCategoryUpdateInput);
+    expect(res.status).toBe(404);
+  });
+
+  it('should not update category with invalid title', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+    const category = res.body.category;
+
+    const updateRes = await updateCategory(category.slug, {
+      title: 20,
+    } as object);
+    expect(updateRes.status).toBe(400);
+    expect(updateRes.body).toHaveProperty('status', 'fail');
+    expect(updateRes.body).toHaveProperty('errors');
+    expect(updateRes.body.errors).toBeInstanceOf(Array);
+  });
+
+  it('should delete category', async () => {
+    const res = await createCategory(validCategoryCreateInput);
+    expect(res.status).toBe(201);
+    const category = res.body.category;
+
+    const deleteRes = await deleteCategory(category.slug);
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body).toHaveProperty('status', 'success');
+  });
+
+  it('should not delete category with invalid slug', async () => {
+    const res = await deleteCategory('invalid-slug');
+    expect(res.status).toBe(404);
+  });
+});

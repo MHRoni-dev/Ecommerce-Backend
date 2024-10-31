@@ -7,5 +7,6 @@ categoryRoutes.post('/create', controller.createCategory);
 categoryRoutes.get('/read', controller.readAllCategory);
 categoryRoutes.get('/read/:slug', controller.readCategoryBySlug);
 categoryRoutes.put('/update/:slug', controller.updateCategoryBySlug);
+categoryRoutes.delete('/delete/:slug', controller.deleteCategoryBySlug);
 
 export default categoryRoutes;

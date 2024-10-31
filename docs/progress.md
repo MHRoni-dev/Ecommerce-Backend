@@ -16,6 +16,7 @@ Category routes :
     - /read
     - /read/:slug
     - /update/:slug
+    - /delete/:slug
 
 ## ToDo
 Product routes:
@@ -25,4 +26,4 @@ Product routes:
 Category routes:
 
 
-    - /delete/:slug
+    - managing product and category relationship

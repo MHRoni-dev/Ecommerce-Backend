@@ -167,3 +167,35 @@ export async function updateCategoryBySlug(
     next(error);
   }
 }
+
+export async function deleteCategoryBySlug(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const slug: string = req.params.slug;
+    if (!slug) {
+      throw createHttpError.BadRequest('slug is required');
+    }
+
+    const category: Category | null = await CategoryModel.findOne({ slug });
+    if (!category) {
+      throw createHttpError.NotFound('Category not found');
+    }
+
+    const deletedCategory = await CategoryModel.findOneAndDelete({ slug });
+
+    // response
+    res.status(200).json({
+      status: 'success',
+      message: 'Category deleted Successfully',
+      category: deletedCategory,
+    });
+
+    //end of function
+    return;
+  } catch (error) {
+    next(error);
+  }
+}

@@ -29,7 +29,8 @@ describe('User E2E test', () => {
     const res = await registerUser(validNewUser);
 
     expect(res.status).toBe(201);
-    expect(res.body.user).toMatchObject(validNewUser);
+    expect(res.body).toHaveProperty('message');
+    expect(res.body).not.toHaveProperty('user');
   });
 
   it('should not create user', async () => {
@@ -54,7 +55,8 @@ describe('User E2E test', () => {
 
     const loginRes = await loginUser(validNewUser);
     expect(loginRes.status).toBe(200);
-    expect(loginRes.body.user).toMatchObject(validNewUser);
+    expect(loginRes.body.user).not.toHaveProperty('password');
+    expect(loginRes.body.user.email).toBe(validNewUser.email);
     expect(loginRes.body).toHaveProperty('accessToken');
   });
 
@@ -71,5 +73,14 @@ describe('User E2E test', () => {
     const loginRes = await loginUser({ ...validNewUser, password: 'wrong' });
     expect(loginRes.status).toBe(400);
     expect(loginRes.body).toHaveProperty('message');
+  });
+
+  it('should not response with password', async () => {
+    const res = await registerUser(validNewUser);
+    expect(res.status).toBe(201);
+
+    const loginRes = await loginUser(validNewUser);
+    expect(loginRes.status).toBe(200);
+    expect(loginRes.body.user).not.toHaveProperty('password');
   });
 });

@@ -5,6 +5,7 @@ import {
 } from '@e2e/__fixtures__/categoryData';
 import app from '@src/app';
 import request from 'supertest';
+import { Category } from '@src/app/v1/types';
 
 beforeAll(async () => {
   await connectDB();
@@ -24,6 +25,10 @@ async function createCategory(data: object) {
 
 async function readCategory(slug: string) {
   return await request(app).get(`/api/v1/category/read/${slug}`);
+}
+
+async function readCategories() {
+  return await request(app).get('/api/v1/category/read');
 }
 
 describe('Category E2E Test', () => {
@@ -67,5 +72,32 @@ describe('Category E2E Test', () => {
     expect(res.status).toBe(404);
   });
 
+  it('should read all categories', async () => {
+    for (let i = 0; i < 5; i++) {
+      const res = await createCategory({
+        title: `Category No ${i + 1}`,
+      });
+      expect(res.status).toBe(201);
+    }
+
+    const res = await readCategories();
+    const categories = res.body.categories;
+
+    expect(res.status).toBe(200);
+    expect(categories).toBeInstanceOf(Array);
+    expect(categories).toHaveLength(5);
+    categories.forEach((category: Category) => {
+      expect(category).toHaveProperty('_id');
+      expect(category).toHaveProperty('slug');
+      expect(category).toHaveProperty('title');
+    });
+  });
+
+  it('should read empty categories', async () => {
+    const res = await readCategories();
+    expect(res.status).toBe(200);
+    expect(res.body.categories).toBeInstanceOf(Array);
+    expect(res.body.categories).toHaveLength(0);
+  });
 
 });

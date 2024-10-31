@@ -7,7 +7,6 @@ import {
 import app from '@src/app';
 import request from 'supertest';
 import { Category, CategoryUpdateInput } from '@src/app/v1/types';
-import { create } from 'domain';
 
 beforeAll(async () => {
   await connectDB();

@@ -52,6 +52,19 @@ const envSchema = z.object({
     SECRET: z.string(),
     EXPIRES_IN: z.string(),
   }),
+
+  MAIL: z.object({
+    HOST: z.string(),
+    USER: z.string(),
+    PASS: z.string(),
+    PORT: z
+      .string()
+      .transform((val) => parseInt(val, 10))
+      .refine((val) => !isNaN(val), { message: 'PORT must be a Number' }),
+    SECURE: z.string().transform((val) => (val === 'true' ? true : false)),
+    APP: z.string(),
+    FROM: z.string().email(),
+  }),
 });
 
 //! make sure to add any env variable for checking
@@ -75,6 +88,15 @@ const env = envSchema.safeParse({
   JWT: {
     SECRET: process.env.JWT_SECRET,
     EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  },
+  MAIL: {
+    HOST: process.env.MAIL_HOST,
+    FROM: process.env.MAIL_FROM,
+    USER: process.env.MAIL_USER,
+    PASS: process.env.MAIL_PASS,
+    PORT: process.env.MAIL_PORT,
+    SECURE: process.env.MAIL_SECURE,
+    APP: process.env.MAIL_APP,
   },
 });
 

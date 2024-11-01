@@ -2,7 +2,7 @@ export type User = {
   _id: string;
   email: string;
   password: string;
-  isverified: boolean;
+  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -18,7 +18,7 @@ export type Profile = {
 // User variants
 export type UserCreatePayload = Omit<
   User,
-  '_id' | 'isverified' | 'createdAt' | 'updatedAt'
+  '_id' | 'isVerified' | 'createdAt' | 'updatedAt'
 >;
 export type UserCreateInput = UserCreatePayload;
 export type UserLoginInput = Pick<User, 'email' | 'password'>;

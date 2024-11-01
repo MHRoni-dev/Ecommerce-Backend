@@ -1,5 +1,6 @@
 import { Document, model, Model, Query, Schema } from 'mongoose';
 import { User } from '@v1/types';
+import { Auth } from '@v1/types';
 
 const user = new Schema(
   {
@@ -10,6 +11,10 @@ const user = new Schema(
     password: {
       type: String,
       required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -22,12 +27,14 @@ const user = new Schema(
 user.set('toJSON', {
   transform: (doc: Document, ret: Partial<User>) => {
     delete ret.password;
+    delete ret.isVerified;
     return ret;
   },
 });
 user.set('toObject', {
   transform: (doc: Document, ret: Partial<User>) => {
     delete ret.password;
+    delete ret.isVerified;
     return ret;
   },
 });
@@ -37,7 +44,41 @@ user.pre<Query<User, User>>(/^find/, function (next) {
   if (!this.getOptions().includePassword) {
     this.select('-password');
   }
+  if (!this.getOptions().includeUnverified) {
+    this.where({ isVerified: true });
+  }
   next();
 });
 
 export const UserModel: Model<User> = model<User>('user', user);
+
+const auth = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    token: {
+      type: String,
+      required: true,
+    },
+    otp: {
+      type: String,
+      required: true,
+    },
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
+    isUsed: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    versionKey: false,
+    timeStamps: true,
+  },
+);
+
+export const AuthModel: Model<Auth> = model<Auth>('auth', auth);

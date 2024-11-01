@@ -45,6 +45,7 @@ export async function registerUser(
     res.status(201).json({
       status: 'success',
       message: 'User created successfully',
+      data: 'Check your email to verify your account',
     });
 
     // end of function
@@ -75,10 +76,15 @@ export async function loginUser(
         email: userLoginInput.email,
       },
       null,
-      { includePassword: true },
+      { includePassword: true, includeUnverified: true },
     );
     if (!userExist) {
       throw createHttpError.BadRequest('Invalid password or email');
+    }
+
+    //  check if user is verifed
+    if (!userExist.isVerified) {
+      throw createHttpError.Forbidden('verify your account first');
     }
 
     // check password

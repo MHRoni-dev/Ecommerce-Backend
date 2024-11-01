@@ -18,6 +18,11 @@ Category routes :
     - /update/:slug
     - /delete/:slug
 
+User rouotes:
+
+    - /register
+    - /login
+
 ## ToDo
 Product routes:
 
@@ -27,3 +32,8 @@ Category routes:
 
 
     - managing product and category relationship
+
+User routes:
+
+    - email verification
+    - password reset

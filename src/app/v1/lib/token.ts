@@ -2,8 +2,9 @@ import config from '@config/index';
 import jwt from 'jsonwebtoken';
 
 interface TokenPayload {
-  _id: string;
+  _id?: string;
   email: string;
+  otp?: string;
 }
 
 interface DecodedToken extends TokenPayload, jwt.JwtPayload {}

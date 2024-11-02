@@ -66,6 +66,7 @@ const envSchema = z.object({
   }),
 
   MAIL: z.object({
+    ENABLED: z.string().transform((val) => (val === 'false' ? false : true)),
     HOST: z.string(),
     USER: z.string(),
     PASS: z.string(),
@@ -104,6 +105,7 @@ const env = envSchema.safeParse({
     EXPIRES_IN: process.env.JWT_EXPIRES_IN,
   },
   MAIL: {
+    ENABLED: process.env.MAIL_ENABLED,
     HOST: process.env.MAIL_HOST,
     FROM: process.env.MAIL_FROM,
     USER: process.env.MAIL_USER,

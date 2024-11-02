@@ -91,6 +91,62 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ZodValidationError'
                   - $ref: '#/components/schemas/HttpError'
+        '403':
+          description: User is not verified
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: User is not verified
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+  /user/resend-verification:
+    post: 
+      tags:
+        - User 
+      summary: resend verification email 
+      description: This endpoint is used to resend verification email. 
+      requestBody:
+        description: User data to resend verification email 
+        required: true 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: 
+                  type: string 
+                  format: email
+                  default: john@doe.com
+                  required: true
+      responses:
+        '200':
+          description: Verification email sent successfully
+          content: 
+            application/json:
+              example:
+                status: success
+                message: Verification email sent successfully
+
+        '400':
+          description: Validation Error or Invalid Input
+          content:
+            application/json:
+              examples:
+                example01:
+                  summary: Invalid email
+                  value:
+                    status: fail
+                    message: Invalid email
+                example02:
+                  summary: Register your account first
+                  value:
+                    status: fail
+                    message: Register your account first
 
         '500':
           description: Server Error
@@ -98,6 +154,79 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ServerError'
+  /user/verify/{email}:
+    get:
+      tags:
+        - User 
+      summary: verify user 
+      description: This endpoint is used to verify user. Either with token or otp. 
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
+            default: john@doe.com
+          description: User email
+        - in: query
+          name: token
+          description: User verification token 
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: otp
+          description: User verification otp 
+          required: false
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: User verified successfully
+          content: 
+            application/json:
+              example:
+                status: success
+                message: User verified successfully
+
+        '400':
+          description: Validation Error or Invalid Input
+          content:
+            application/json:
+              examples:
+                example01:
+                  summary: Invalid email
+                  value:
+                    status: fail
+                    message: Invalid email
+                example02:
+                  summary: Register your account first
+                  value:
+                    status: fail
+                    message: Register your account first
+                example03:
+                  summary: Invalid otp or token
+                  value:
+                    status: fail
+                    message: Invalid otp or token  
+                
+
+        '403':
+          description: User already verified
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: User already verified
+        '500':
+          description: Server Error
+          content:  
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError' 
+
 
 components:
   schemas:

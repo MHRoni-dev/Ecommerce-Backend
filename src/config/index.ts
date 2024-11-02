@@ -39,6 +39,18 @@ const envSchema = z.object({
         message: 'HASHING_SALT_ROUNDS must be a Number',
       })
       .default('10'),
+    OTP_LENGTH: z
+      .string()
+      .transform((val) => parseInt(val, 10))
+      .refine((val) => !isNaN(val), { message: 'OTP_LENGTH must be a Number' })
+      .default('6'),
+    OTP_DURATION: z
+      .string()
+      .transform((val) => parseInt(val, 10))
+      .refine((val) => !isNaN(val), {
+        message: 'OTP_DURATION must be a Number',
+      })
+      .default('300000'),
   }),
 
   DATABASE: z.object({
@@ -78,6 +90,8 @@ const env = envSchema.safeParse({
     REQ_LIMIT: process.env.REQ_LIMIT,
     TIME_FRAME: process.env.REQ_TIMEFRAME,
     HASHING_SALT_ROUNDS: process.env.HASHING_SALT_ROUNDS,
+    OTP_LENGTH: process.env.OTP_LENGTH,
+    OTP_DURATION: process.env.OTP_DURATION,
   },
   DATABASE: {
     USER: process.env.DATABASE_USER,

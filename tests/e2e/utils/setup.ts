@@ -1,11 +1,21 @@
-import config from '@config/index';
+// import config from '@config/index';
 import mongoose from 'mongoose';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
+let mongoServer: MongoMemoryReplSet | null = null;
 
 export const connectDB = async (): Promise<void> => {
   // console.log('connecting to the test database...');
-  await mongoose.connect(config.DATABASE.URL, {
-    user: config.DATABASE.USER,
-    pass: config.DATABASE.PASS,
+  // normal connection
+  // await mongoose.connect(config.DATABASE.URL, {
+  //   user: config.DATABASE.USER,
+  //   pass: config.DATABASE.PASS,
+  //   dbName: 'test',
+  // });
+  mongoServer = await MongoMemoryReplSet.create({
+    replSet: { count: 1 },
+  });
+  // Inmemory connection
+  await mongoose.connect(mongoServer.getUri(), {
     dbName: 'test',
   });
 };
@@ -18,4 +28,5 @@ export const clearDB = async (): Promise<void> => {
 export const disconnectDB = async (): Promise<void> => {
   // console.log('disconnecting database...');
   await mongoose.disconnect();
+  await mongoServer?.stop();
 };

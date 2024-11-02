@@ -28,7 +28,7 @@ async function loginUser(data: UserLoginInput) {
 async function verifyUser(email: string, otp?: string, token?: string) {
   return await request(app)
     .get(
-      `/api/v1/user/verify/${email}?${otp ? `otp=${otp}` : ''}${token ? `&token=${token}` : ''}`,
+      `/api/v1/user/verify/${email}?${otp ? `otp=${otp}` : ''}${token ? `token=${token}` : ''}`,
     )
     .send();
 }

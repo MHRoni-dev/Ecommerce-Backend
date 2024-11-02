@@ -38,9 +38,6 @@ importers:
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
-      mongodb-memory-server:
-        specifier: ^10.1.2
-        version: 10.1.2
       mongoose:
         specifier: ^8.7.2
         version: 8.7.2
@@ -144,6 +141,9 @@ importers:
       lint-staged:
         specifier: ^15.2.10
         version: 15.2.10
+      mongodb-memory-server:
+        specifier: ^10.1.2
+        version: 10.1.2
       nodemon:
         specifier: ^3.1.7
         version: 3.1.7

@@ -22,11 +22,29 @@ export const connectDB = async (): Promise<void> => {
 
 export const clearDB = async (): Promise<void> => {
   // console.log('clearing the database...');
-  await mongoose.connection.dropDatabase();
+  if (mongoose.connection.readyState === 1) {
+    try {
+      await mongoose.connection.dropDatabase();
+    } catch (error: unknown) {
+      // Narrow the type if `error` is an instance of Error
+      if (error instanceof Error && (error as { code?: number }).code === 112) {
+        console.warn('WriteConflict detected. Retrying dropDatabase...');
+        await mongoose.connection.dropDatabase(); // Retry once
+      } else {
+        console.error('Error during database cleanup:', error);
+        throw error;
+      }
+    }
+  }
 };
 
 export const disconnectDB = async (): Promise<void> => {
   // console.log('disconnecting database...');
-  await mongoose.disconnect();
-  await mongoServer?.stop();
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.disconnect();
+  }
+  if (mongoServer) {
+    await mongoServer.stop();
+    mongoServer = null;
+  }
 };

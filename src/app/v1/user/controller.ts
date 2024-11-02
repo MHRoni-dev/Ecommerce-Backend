@@ -77,6 +77,7 @@ export async function registerUser(
 
       await session.commitTransaction();
     } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       throw error;
     } finally {
@@ -85,16 +86,84 @@ export async function registerUser(
     //>
 
     // >> send mail
-    await sendMail({
-      to: userInputData.email,
-      subject: 'OTP code',
-      text: `Your otp is ${otp}`,
-    });
+    if (config.MAIL.ENABLED) {
+      await sendMail({
+        to: userInputData.email,
+        subject: 'OTP code',
+        text: `Your otp is ${otp}`,
+      });
+    }
 
     // >> response
     res.status(201).json({
       status: 'success',
       message: 'User created successfully',
+      data: 'Check your email to verify your account',
+    });
+
+    // end of function
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function resendVerification(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    // >> check email
+    const email = req.body.email;
+    const isEmail = await z.string().email().safeParseAsync(email);
+    if (!isEmail.success) {
+      throw createHttpError.BadRequest('Invalid email');
+    }
+
+    // >> check if user exist
+    const userExist = await UserModel.findOne(
+      {
+        email: isEmail.data,
+      },
+      null,
+      { includeUnverified: true },
+    );
+    if (!userExist) {
+      throw createHttpError.BadRequest('Register your account first');
+    }
+
+    // >> generate otp and token
+    const otp = generateOTP();
+    const token = await generateTokenAsync({
+      email: isEmail.data,
+      otp: otp,
+    });
+
+    // >> update auth
+    await AuthModel.findOneAndUpdate(
+      { email: isEmail.data },
+      {
+        email: isEmail.data,
+        otp,
+        token,
+        expiresAt: new Date(Date.now() + config.SECURITY.OTP_DURATION),
+      },
+    );
+
+    // >> send mail
+    if (config.MAIL.ENABLED) {
+      await sendMail({
+        to: isEmail.data,
+        subject: 'OTP code',
+        text: `Your otp is ${otp}`,
+      });
+    }
+
+    // >> response
+    res.status(200).json({
+      status: 'success',
+      message: 'Verification sent successfully',
       data: 'Check your email to verify your account',
     });
 

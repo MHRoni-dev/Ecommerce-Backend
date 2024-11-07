@@ -33,12 +33,22 @@ async function verifyUser(email: string, otp?: string, token?: string) {
     .send();
 }
 
-async function resendVerification(email: string) {
+async function resendVerification(email: string, purpose?: string) {
   return await request(app)
     .post('/api/v1/user/resend-verification')
-    .send({ email });
+    .send({ email, purpose });
 }
 
+async function resetPassword(
+  email: string,
+  password: string,
+  otp?: string,
+  token?: string,
+) {
+  return await request(app)
+    .put('/api/v1/user/reset-password')
+    .send({ email, password, otp, token });
+}
 describe('User E2E test', () => {
   describe('Register User', () => {
     it('should create user', async () => {
@@ -240,6 +250,116 @@ describe('User E2E test', () => {
       const loginRes = await loginUser(validNewUser);
       expect(loginRes.status).toBe(200);
       expect(loginRes.body.user).not.toHaveProperty('password');
+    });
+  });
+
+  describe('Reset Password', () => {
+    it('should not let unverified user reset password', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const resetPassRes = await resetPassword(
+        validNewUser.email,
+        validNewUser.password + 'new',
+      );
+      expect(resetPassRes.status).toBe(400);
+    });
+
+    it('should not let reset password with wrong otp or token', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const auth = await AuthModel.findOne({ email: validNewUser.email });
+
+      const verifyRes = await verifyUser(validNewUser.email, auth?.otp);
+      expect(verifyRes.status).toBe(200);
+
+      const sendVerifyRes = await resendVerification(
+        validNewUser.email,
+        'passwordReset',
+      );
+      expect(sendVerifyRes.status).toBe(200);
+
+      const resetPassRes = await resetPassword(
+        validNewUser.email,
+        validNewUser.password + 'new',
+        'wrong',
+        'wrong',
+      );
+      expect(resetPassRes.status).toBe(400);
+    });
+
+    it('should reset password', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const auth = await AuthModel.findOne({ email: validNewUser.email });
+
+      const verifyRes = await verifyUser(validNewUser.email, auth?.otp);
+      expect(verifyRes.status).toBe(200);
+
+      const sendVerifyRes = await resendVerification(
+        validNewUser.email,
+        'passwordReset',
+      );
+      expect(sendVerifyRes.status).toBe(200);
+
+      const auth2 = await AuthModel.findOne({
+        email: validNewUser.email,
+        purpose: 'passwordReset',
+      });
+
+      const resetPassRes = await resetPassword(
+        validNewUser.email,
+        validNewUser.password + 'new',
+        auth2?.otp,
+      );
+      expect(resetPassRes.status).toBe(200);
+
+      const loginRes = await loginUser({
+        email: validNewUser.email,
+        password: validNewUser.password + 'new',
+      });
+      expect(loginRes.status).toBe(200);
+
+      const loginRes2 = await loginUser(validNewUser);
+      expect(loginRes2.status).toBe(400);
+      expect(loginRes2.body).toHaveProperty('message');
+    });
+
+    it('should handle used otp and token', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const auth = await AuthModel.findOne({ email: validNewUser.email });
+
+      const verifyRes = await verifyUser(validNewUser.email, auth?.otp);
+      expect(verifyRes.status).toBe(200);
+
+      const sendVerifyRes = await resendVerification(
+        validNewUser.email,
+        'passwordReset',
+      );
+      expect(sendVerifyRes.status).toBe(200);
+
+      const auth2 = await AuthModel.findOne({
+        email: validNewUser.email,
+        purpose: 'passwordReset',
+      });
+
+      const resetPassRes = await resetPassword(
+        validNewUser.email,
+        validNewUser.password + 'new',
+        auth2?.otp,
+      );
+      expect(resetPassRes.status).toBe(200);
+
+      const resetPassRes2 = await resetPassword(
+        validNewUser.email,
+        validNewUser.password + 'new2',
+        auth2?.otp,
+      );
+      expect(resetPassRes2.status).toBe(403);
     });
   });
 });

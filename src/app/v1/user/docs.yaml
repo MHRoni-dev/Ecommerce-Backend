@@ -123,6 +123,22 @@ paths:
                   format: email
                   default: john@doe.com
                   required: true
+                purpose:
+                  type: string
+                  default: emailVerification
+                  enum: [emailVerification, passwordReset]
+                  required: false
+            examples:
+              example01:
+                summary: Send verification for email verification
+                value:
+                  email: john@doe.com
+                  purpose: emailVerification
+              example02:
+                summary: Send verification for password reset
+                value:
+                  email: john@doe.com
+                  purpose: passwordReset
       responses:
         '200':
           description: Verification email sent successfully
@@ -227,7 +243,98 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ServerError' 
 
+  /user/reset-password:
+    put:
+      tags:
+        - User 
+      summary: reset user password 
+      description: you need to be verified user to reset password, and request verification from resend-verification endpoint first
+      requestBody:
+        description: User data to reset password 
+        required: true 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: 
+                  type: string 
+                  format: email
+                  default: john@doe.com
+                  required: true
+                password:
+                  type: string
+                  format: password
+                  default: XXXXXXXX
+                  required: true
+                otp:
+                  type: string
+                  required: false
+                  default: 123456
+                token: 
+                  type: string
+                  required: false
+            examples:
+              example01:
+                summary: request reset password with otp
+                value:
+                  email: johndoe@doe.com
+                  password: password
+                  otp: 123456
+              example02:
+                summary: request reset password with token
+                value:
+                  email: johndoe@doe.com
+                  password: password
+                  token: token
+      responses:
+        '200':
+          description: User password reset successfully
+          content:
+            application/json:
+              example:
+                status: success
+                message: User password reset successfully
 
+        '400':
+          description: Validation Error or Invalid Input
+          content:
+            application/json:
+              examples:
+                example01:
+                  summary: Invalid email
+                  value:
+                    status: fail
+                    message: Invalid email
+                example02: 
+                  summary: Password required
+                  value:
+                    status: fail
+                    message: Password is required
+                example03:
+                  summary: Register your account first
+                  value:
+                    status: fail
+                    message: Register your account first
+                example04:
+                  summary: Invalid otp or token
+                  value:
+                    status: fail
+                    message: Invalid otp or token
+        '403':
+          description: Otp or token is already used 
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Otp or token is already used
+
+        '500':
+          description: Server Error
+          content:  
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
 components:
   schemas:
   # User Input Schemas

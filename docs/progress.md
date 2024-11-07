@@ -22,6 +22,9 @@ User rouotes:
 
     - /register
     - /login
+    - email verification
+    - password reset
+
 
 ## ToDo
 Product routes:
@@ -30,10 +33,6 @@ Product routes:
 
 Category routes:
 
-
     - managing product and category relationship
 
 User routes:
-
-    - email verification
-    - password reset

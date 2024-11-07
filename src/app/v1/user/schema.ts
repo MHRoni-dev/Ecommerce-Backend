@@ -13,3 +13,7 @@ export const userLoginInputZodSchema = z.object({
 export const userUpdateInputZodSchema = userCreateInputZodSchema
   .omit({ email: true })
   .partial();
+
+export const validVerificationReqPurposeZodSchema = z
+  .enum(['emailVerification', 'passwordReset'])
+  .default('emailVerification');

@@ -3,6 +3,7 @@ export type Auth = {
   email: string;
   token: string;
   otp: string;
+  purpose: string;
   expiresAt: Date;
   isUsed: boolean;
   createdAt: Date;

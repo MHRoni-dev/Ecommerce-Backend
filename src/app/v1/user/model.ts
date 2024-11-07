@@ -66,6 +66,11 @@ const auth = new Schema(
       type: String,
       required: true,
     },
+    purpose: {
+      type: String,
+      required: true,
+      default: 'emailVerification',
+    },
     expiresAt: {
       type: Date,
       required: true,

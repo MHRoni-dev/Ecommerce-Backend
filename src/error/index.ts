@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose';
 import { HttpError } from 'http-errors';
 import { ZodError } from 'zod';
 import { JsonParseError } from '@error/Error';
-import { TokenExpiredError } from 'jsonwebtoken';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 export function handleError(
   err: HttpError | ZodError | JsonParseError,
@@ -43,6 +43,15 @@ export function handleError(
     res.status(401).json({
       status: 'fail',
       message: 'Token is expired',
+      data: 'Please login again',
+    });
+    return;
+  }
+
+  if (err instanceof JsonWebTokenError) {
+    res.status(401).json({
+      status: 'fail',
+      message: 'Token is invalid',
       data: 'Please login again',
     });
     return;

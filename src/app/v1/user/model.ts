@@ -8,6 +8,14 @@ const user = new Schema(
       type: String,
       required: true,
     },
+    profileImage: {
+      url: {
+        type: String,
+      },
+      publicId: {
+        type: String,
+      },
+    },
     password: {
       type: String,
       required: true,

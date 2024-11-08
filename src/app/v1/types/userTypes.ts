@@ -1,6 +1,10 @@
 export type User = {
   _id: string;
   email: string;
+  profileImage?: {
+    url: string;
+    public_id: string;
+  };
   password: string;
   isVerified: boolean;
   createdAt: Date;
@@ -24,4 +28,6 @@ export type UserCreateInput = UserCreatePayload;
 export type UserLoginInput = Pick<User, 'email' | 'password'>;
 
 export type UserUpdateInput = Partial<Pick<User, 'password'>>;
-export type UserUpdatePayload = Partial<Pick<User, 'password'>>;
+export type UserUpdatePayload = Partial<
+  Pick<User, 'password' | 'profileImage'>
+>;

@@ -1,5 +1,5 @@
 // >> import
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response, Express } from 'express';
 import { UserCreateInput, UserLoginInput } from '@v1/types';
 import {
   userCreateInputZodSchema,
@@ -15,6 +15,7 @@ import mongoose from 'mongoose';
 import { generateOTP } from '@v1/lib/otp';
 import config from '@config/index';
 import { sendMail } from '../lib/mail';
+import { uploadSingleFile, UPLODAD_FOLDER } from '../lib/imageUpload';
 
 export async function registerUser(
   req: Request,
@@ -416,6 +417,70 @@ export async function resetPassword(
     res.status(200).json({
       status: 'success',
       message: 'Password reset successfully',
+    });
+
+    //end of function
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function setProfileImage(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    // >> check if user is logged in and data is added in req
+    const user = req.app.locals.user;
+    if (!user) {
+      throw createHttpError.Unauthorized('Please login first');
+    }
+
+    // >> check if profile image is provided
+    const profileImage = req.file as Express.Multer.File;
+    if (!profileImage) {
+      throw createHttpError.BadRequest('Profile image is required');
+    }
+
+    // >> upload profile image
+    const uploadProfileImage = await uploadSingleFile(profileImage, {
+      folder: UPLODAD_FOLDER.USER,
+      overwrite: true,
+      public_id: user._id,
+      filename_override: user.email?.split('@')[0],
+      display_name: user.email?.split('@')[0],
+      unique_filename: true,
+      tags: ['profileImage', 'ecommerce', 'user'],
+    });
+    if (!uploadProfileImage) {
+      throw createHttpError.InternalServerError(
+        'something went wrong, try again!',
+      );
+    }
+    console.log(uploadProfileImage);
+    // >> update profile image
+    const updateProfileImage = await UserModel.findByIdAndUpdate(user._id, {
+      profileImage: {
+        url: uploadProfileImage.secure_url,
+        publicId: uploadProfileImage.public_id,
+      },
+    });
+    if (!updateProfileImage) {
+      throw createHttpError.InternalServerError(
+        'something went wrong, try again!',
+      );
+    }
+
+    // >> response
+    res.status(200).json({
+      status: 'success',
+      message: 'Profile image updated successfully',
+      data: {
+        url: uploadProfileImage.secure_url,
+        public_id: uploadProfileImage.public_id,
+      },
     });
 
     //end of function

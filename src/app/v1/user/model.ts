@@ -20,6 +20,17 @@ const user = new Schema(
       type: String,
       required: true,
     },
+    name: {
+      type: String,
+      default: (doc: User) =>
+        doc.email.split('@')[0].replace(/[0-9]/g, '').replace(/\./g, ' '),
+    },
+    phone: String,
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+    },
+    dateOfBirth: Date,
     isVerified: {
       type: Boolean,
       default: false,

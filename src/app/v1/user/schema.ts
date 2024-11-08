@@ -10,9 +10,21 @@ export const userLoginInputZodSchema = z.object({
   password: z.string().trim().min(6),
 });
 
-export const userUpdateInputZodSchema = userCreateInputZodSchema
-  .omit({ email: true })
-  .partial();
+export const userProfileZodSchema = z
+  .object({
+    name: z.string().trim().optional(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^[0-9]{11}$/)
+      .optional(),
+    gender: z.enum(['male', 'female', 'other']).optional(),
+    dateOfBirth: z
+      .string()
+      .transform((d) => new Date(d))
+      .optional(),
+  })
+  .strip();
 
 export const validVerificationReqPurposeZodSchema = z
   .enum(['emailVerification', 'passwordReset'])

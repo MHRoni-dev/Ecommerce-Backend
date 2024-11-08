@@ -4,6 +4,7 @@ import { UserCreateInput, UserLoginInput } from '@v1/types';
 import {
   userCreateInputZodSchema,
   userLoginInputZodSchema,
+  userProfileZodSchema,
   validVerificationReqPurposeZodSchema,
 } from '@v1/user/schema';
 import { AuthModel, UserModel } from '@v1/user/model';
@@ -484,6 +485,49 @@ export async function setProfileImage(
     });
 
     //end of function
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateProfileData(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    // >> check if user is logged in and data is added in req
+    const user = req.app.locals.user;
+    if (!user) {
+      throw createHttpError.Unauthorized('Please login first');
+    }
+
+    // >> validate updateable data
+    const updateableData = await userProfileZodSchema.safeParseAsync(req.body);
+    if (!updateableData.success) {
+      throw updateableData.error;
+    }
+
+    // >> update profile data
+    const updatedProfile = await UserModel.findByIdAndUpdate(
+      user._id,
+      updateableData.data,
+      { new: true },
+    );
+    if (!updatedProfile) {
+      throw createHttpError.InternalServerError(
+        'something went wrong, try again!',
+      );
+    }
+
+    // >> response
+    res.status(200).json({
+      status: 'success',
+      message: 'Profile data updated successfully',
+      user: updatedProfile,
+    });
+    // end of function
     return;
   } catch (error) {
     next(error);

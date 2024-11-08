@@ -16,5 +16,10 @@ userRoutes.post(
   handleFile.single('profileImage'),
   controller.setProfileImage,
 );
+userRoutes.put(
+  '/update-profile-data',
+  isLoggedIn,
+  controller.updateProfileData,
+);
 
 export default userRoutes;

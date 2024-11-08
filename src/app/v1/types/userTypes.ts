@@ -6,6 +6,10 @@ export type User = {
     public_id: string;
   };
   password: string;
+  name?: string;
+  phone?: string;
+  gender?: 'male' | 'female' | 'other';
+  dateOfBirth?: Date;
   isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;

@@ -78,6 +78,13 @@ const envSchema = z.object({
     APP: z.string(),
     FROM: z.string().email(),
   }),
+
+  CLOUDINARY: z.object({
+    CLOUD_NAME: z.string(),
+    API_KEY: z.string(),
+    API_SECRET: z.string(),
+  }),
+  IMAGE_UPLOAD: z.string().transform((val) => (val === 'false' ? false : true)),
 });
 
 //! make sure to add any env variable for checking
@@ -113,6 +120,12 @@ const env = envSchema.safeParse({
     PORT: process.env.MAIL_PORT,
     SECURE: process.env.MAIL_SECURE,
     APP: process.env.MAIL_APP,
+  },
+  IMAGE_UPLOAD: process.env.IMAGE_UPLOAD,
+  CLOUDINARY: {
+    CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    API_KEY: process.env.CLOUDINARY_API_KEY,
+    API_SECRET: process.env.CLOUDINARY_API_SECRET,
   },
 });
 

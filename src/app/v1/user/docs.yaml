@@ -389,8 +389,86 @@ paths:
               schema: 
                 $ref: '#/components/schemas/ServerError'
 
+  /user/update-profile-data:
+    put:
+      tags:
+        - User
+      summary: update user profile 
+      description: you need to be verified user to update profile
+      requestBody:
+        description: User data to update profile 
+        required: true 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  required: false
+                phone:
+                  type: string
+                  required: false
+                gender:
+                  type: string
+                  oneOf:
+                    - male
+                    - female
+                    - other
+                  required: false
+                dateOfBirth:
+                  type: string
+                  format: date
+                  required: false
+            examples:
+              example01:
+                summary: update name
+                value:
+                  name: john
+              example02:
+                summary: update phone
+                value:
+                  phone: '1234567890'
+              example03:
+                summary: update gender
+                value:
+                  gender: male
+              example04:
+                summary: update date of birth
+                value:
+                  dateOfBirth: 2000-01-01
 
+      responses:
+        '200':
+          description: User profile updated successfully
+          content:
+            application/json:
+              example:
+                status: success
+                message: User profile updated successfully
+                data: 
+                  $ref: '#/components/examples/UserExample'
 
+        '400': 
+          description: Validation Error or Invalid Input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZodValidationError'
+
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Please login first
+        '500':
+          description: Server Error
+          content:  
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
 components:
   schemas:
   # User Input Schemas
@@ -419,6 +497,20 @@ components:
         email:
           type: string
           format: email 
+        name:
+          type: string
+        phone:
+          type: string
+          format: phone
+        gender:
+          type: string
+          oneOf:
+            - male
+            - female
+            - other
+        dateOfBirth:
+          type: string
+          format: date
         createdAt:
           type: string
           format: date-time
@@ -479,6 +571,10 @@ components:
       value: 
           _id: "67187b802898a8832b15acfa"
           email: "johndoe@doe.com"
+          name: "john doe"
+          phone: "1234567890"
+          gender: "male"
+          dateOfBirth: "2000-01-01"
           createdAt: "2024-10-23T04:28:48.548Z"
           updatedAt: "2024-10-23T04:28:48.548Z"
 

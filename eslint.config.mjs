@@ -26,7 +26,7 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...prettier.rules, // Disables ESLint rules that conflict with Prettier
       ...eslintPluginJest.configs.recommended.rules,
-      indent: ['error', 2],
+      indent: 'off',
       'prettier/prettier': [
         'error',
         { tabWidth: 2, singleQuote: true, endOfLine: 'lf' },

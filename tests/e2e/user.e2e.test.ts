@@ -56,6 +56,14 @@ async function resetPassword(
     .put('/api/v1/user/reset-password')
     .send({ email, password, otp, token });
 }
+
+async function updatePassword(token?: string, data?: object) {
+  return await request(app)
+    .put('/api/v1/user/update-password')
+    .set('Authorization', `Bearer ${token}`)
+    .send(data);
+}
+
 describe('User E2E test', () => {
   describe('Register User', () => {
     it('should create user', async () => {
@@ -427,6 +435,47 @@ describe('User E2E test', () => {
 
       const againLoginRes = await loginUser(validNewUser);
       expect(againLoginRes.status).toBe(200);
+    });
+  });
+
+  describe('Update User Password', () => {
+    it('should not let unverified and unauthenticated user update password', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const updatePassRes = await updatePassword(undefined, {
+        oldPassword: validNewUser.password,
+        newPassword: validNewUser.password + 'new',
+      });
+      expect(updatePassRes.status).toBe(401);
+    });
+
+    it('should update user password', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const auth = await AuthModel.findOne({ email: validNewUser.email });
+
+      const verifyRes = await verifyUser(validNewUser.email, auth?.otp);
+      expect(verifyRes.status).toBe(200);
+
+      const loginRes = await loginUser(validNewUser);
+      expect(loginRes.status).toBe(200);
+
+      const updatePassRes = await updatePassword(loginRes.body.accessToken, {
+        oldPassword: validNewUser.password,
+        newPassword: validNewUser.password + 'new',
+      });
+      expect(updatePassRes.status).toBe(200);
+
+      const againLoginResWithOldPass = await loginUser(validNewUser);
+      expect(againLoginResWithOldPass.status).toBe(400);
+
+      const loginWithNewPassRes = await loginUser({
+        ...validNewUser,
+        password: validNewUser.password + 'new',
+      });
+      expect(loginWithNewPassRes.status).toBe(200);
     });
   });
 });

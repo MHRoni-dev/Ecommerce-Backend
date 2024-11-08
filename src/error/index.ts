@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { Error as MongooseError } from 'mongoose';
 import { HttpError } from 'http-errors';
 import { ZodError } from 'zod';
 import { JsonParseError } from '@error/Error';
@@ -43,6 +44,23 @@ export function handleError(
       status: 'fail',
       message: 'Token is expired',
       data: 'Please login again',
+    });
+    return;
+  }
+
+  if (err instanceof MongooseError.CastError) {
+    if (err.kind === 'date') {
+      res.status(400).json({
+        status: 'fail',
+        message: err.path.toString() + ' is not a valid date',
+      });
+      return;
+    }
+
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid Input',
+      name: 'cast error',
     });
     return;
   }

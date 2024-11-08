@@ -469,6 +469,71 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ServerError'
+  
+  /user/update-password:
+    put:
+      tags:
+        - User
+      summary: update user password
+      description: you need to be verified user to update password
+      requestBody:
+        description: User data to update password 
+        required: true 
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldpassword:
+                  type: string
+                  required: true
+                newPassword:
+                  type: string
+                  required: true
+            examples:
+              example01:
+                summary: set password to XXXXXXXXX
+                value:
+                  oldPassword: password here
+                  newPassword: XXXXXXXXX
+              example02:
+                summary: set password to 12345678
+                value:
+                  oldPassword: password here
+                  newPassword: '12345678'
+
+      responses:
+        '200':
+          description: User password updated successfully
+          content:
+            application/json:
+              example:
+                status: success
+                message: Password updated successfully
+
+        '400':  
+          description: Validation Error or Invalid Input
+          content:
+            application/json:
+              example:
+                status: fail
+                message: oldPassword and newPassword is required
+
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Please login first
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+
 components:
   schemas:
   # User Input Schemas

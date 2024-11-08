@@ -10,5 +10,11 @@ export async function verifyPassword(
   password: string,
   hash: string,
 ): Promise<boolean> {
+  if (!password) {
+    throw new Error('password is required');
+  }
+  if (!hash) {
+    throw new Error('hash is required');
+  }
   return await bcrypt.compare(password, hash);
 }

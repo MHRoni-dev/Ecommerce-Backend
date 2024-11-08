@@ -533,3 +533,66 @@ export async function updateProfileData(
     next(error);
   }
 }
+
+export async function updatePassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    // >> check if user is logged in and data is added in req
+    const user = req.app.locals.user;
+    if (!user) {
+      throw createHttpError.Unauthorized('Please login first');
+    }
+
+    // >> validate newPassword and oldPassword
+    const newPassword = req.body.newPassword;
+    const oldPassword = req.body.oldPassword;
+    if (!newPassword || !oldPassword) {
+      throw createHttpError.BadRequest(
+        'newPassword and oldPassword is required',
+      );
+    }
+
+    // >> get password and check if it is correct
+    const userData = await UserModel.findById(user._id, null, {
+      includePassword: true,
+    });
+    if (!userData) {
+      throw createHttpError.InternalServerError('something went wrong');
+    }
+    const oldHashPassword = userData.password;
+    const isPasswordCorrect = await verifyPassword(
+      oldPassword,
+      oldHashPassword,
+    );
+    if (!isPasswordCorrect) {
+      throw createHttpError.BadRequest('Password is incorrect');
+    }
+
+    // >> hash new password and update password
+    const hashedPassword = await hashPassword(newPassword);
+    const updatedPassword = await UserModel.findByIdAndUpdate(
+      user._id,
+      { password: hashedPassword },
+      { new: true },
+    );
+    if (!updatedPassword) {
+      throw createHttpError.InternalServerError(
+        'something went wrong, try again!',
+      );
+    }
+
+    // >> response
+    res.status(200).json({
+      status: 'success',
+      message: 'Password updated successfully',
+    });
+
+    // end of function
+    return;
+  } catch (error) {
+    next(error);
+  }
+}

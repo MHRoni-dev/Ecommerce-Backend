@@ -10,6 +10,7 @@ userRoutes.post('/resend-verification/', controller.resendVerification);
 userRoutes.get('/verify/:email', controller.verifyUser);
 userRoutes.post('/login', controller.loginUser);
 userRoutes.put('/reset-password', controller.resetPassword);
+userRoutes.put('/update-password', isLoggedIn, controller.updatePassword);
 userRoutes.post(
   '/update-profile-image',
   isLoggedIn,

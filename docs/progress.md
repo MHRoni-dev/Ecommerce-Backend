@@ -22,9 +22,13 @@ User rouotes:
 
     - /register
     - /login
-    - email verification
-    - password reset
-
+    - /resend-verification
+    - /verify/:email
+    - /login
+    - /reset-password
+    - /update-password
+    - /udpate-profile-image
+    - /update-profile-data
 
 ## ToDo
 Product routes:
@@ -36,3 +40,5 @@ Category routes:
     - managing product and category relationship
 
 User routes:
+
+    - /verify/:email => get email form body and make the request put not get and rename route to /verify-email

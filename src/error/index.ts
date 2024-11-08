@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { HttpError } from 'http-errors';
 import { ZodError } from 'zod';
 import { JsonParseError } from '@error/Error';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 export function handleError(
   err: HttpError | ZodError | JsonParseError,
@@ -33,6 +34,15 @@ export function handleError(
     res.status(400).json({
       stauts: 'fail',
       message: 'Input is in Invalid JSON format',
+    });
+    return;
+  }
+
+  if (err instanceof TokenExpiredError) {
+    res.status(401).json({
+      status: 'fail',
+      message: 'Token is expired',
+      data: 'Please login again',
     });
     return;
   }

@@ -39,6 +39,13 @@ async function resendVerification(email: string, purpose?: string) {
     .send({ email, purpose });
 }
 
+async function updateUserProfile(token?: string, data?: object) {
+  return await request(app)
+    .put('/api/v1/user/update-profile-data')
+    .set('Authorization', `Bearer ${token}`)
+    .send(data);
+}
+
 async function resetPassword(
   email: string,
   password: string,
@@ -360,6 +367,66 @@ describe('User E2E test', () => {
         auth2?.otp,
       );
       expect(resetPassRes2.status).toBe(403);
+    });
+  });
+
+  describe('Update User Profile', () => {
+    it('should not let unverified and unauthenticated user update profile', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const updateUserRes = await updateUserProfile(undefined, {
+        name: 'John Doe',
+      });
+      expect(updateUserRes.status).toBe(401);
+    });
+
+    it('should update user profile', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const auth = await AuthModel.findOne({ email: validNewUser.email });
+
+      const verifyRes = await verifyUser(validNewUser.email, auth?.otp);
+      expect(verifyRes.status).toBe(200);
+
+      const loginRes = await loginUser(validNewUser);
+      expect(loginRes.status).toBe(200);
+
+      const updateUserRes = await updateUserProfile(loginRes.body.accessToken, {
+        name: 'John Doe',
+        phone: '12345678900',
+        gender: 'male',
+        dateOfBirth: '1990-01-01z',
+      });
+      expect(updateUserRes.status).toBe(200);
+    });
+
+    it('should not update property that is not allowed', async () => {
+      const createUserRes = await registerUser(validNewUser);
+      expect(createUserRes.status).toBe(201);
+
+      const auth = await AuthModel.findOne({ email: validNewUser.email });
+
+      const verifyRes = await verifyUser(validNewUser.email, auth?.otp);
+      expect(verifyRes.status).toBe(200);
+
+      const loginRes = await loginUser(validNewUser);
+      expect(loginRes.status).toBe(200);
+
+      const updateUserRes = await updateUserProfile(loginRes.body.accessToken, {
+        email: 'wrong',
+        password: 'wrong',
+        profileImage: 'wrong',
+      });
+      expect(updateUserRes.status).toBe(200);
+      expect(updateUserRes.body.user.email).toBe(loginRes.body.user.email);
+      expect(updateUserRes.body.user.profileImage).toBe(
+        loginRes.body.user.profileImage,
+      );
+
+      const againLoginRes = await loginUser(validNewUser);
+      expect(againLoginRes.status).toBe(200);
     });
   });
 });

@@ -7,5 +7,15 @@ servers:
     description: v1 - localhost
   - url: https://ecommerce-backend-lxhy.onrender.com/api/v1
     description: v1 - live
+security:
+  - BearerAuth: []
+      
 
 
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  

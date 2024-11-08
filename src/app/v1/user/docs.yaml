@@ -335,6 +335,62 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/ServerError'
+
+  /user/update-profile-image:
+    post:
+      tags:
+        - User
+      summary: update user profile 
+      description: you need to be verified user to update profile
+      requestBody:
+        description: User data to update profile 
+        required: true 
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profileImage: 
+                  type: string 
+                  format: binary
+                  required: true
+                
+
+      responses:
+        '200':
+          description: User profile updated successfully
+          content:
+            application/json:
+              example:
+                status: success
+                message: User profile updated successfully
+                data: 
+                  profileImage: profile image url
+                  publicId: profile image public id
+
+        '400':
+          description: Image not provided or invalid image
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: profile image is required
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Please login first
+        '500':
+          description: Server Error
+          content:  
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+
+
 components:
   schemas:
   # User Input Schemas

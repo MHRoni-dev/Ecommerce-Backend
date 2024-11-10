@@ -17,6 +17,7 @@ export const connectDB = async (): Promise<void> => {
   // Inmemory connection
   await mongoose.connect(mongoServer.getUri(), {
     dbName: 'test',
+    connectTimeoutMS: 10000,
   });
 };
 
@@ -46,5 +47,13 @@ export const disconnectDB = async (): Promise<void> => {
   if (mongoServer) {
     await mongoServer.stop();
     mongoServer = null;
+  }
+};
+
+export const deleteCollection = async (
+  collectionName: string,
+): Promise<void> => {
+  if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
+    await mongoose.connection.db.dropCollection(collectionName);
   }
 };

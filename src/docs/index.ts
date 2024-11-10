@@ -7,6 +7,7 @@ let swaggerDocument;
 let productDocs;
 let categoryDocs;
 let userDocs;
+let cartDocs;
 
 try {
   // Load the main OpenAPI YAML
@@ -23,8 +24,10 @@ try {
 
   userDocs = YAML.load(path.join('src', 'app', 'v1', 'user', 'docs.yaml'));
 
+  cartDocs = YAML.load(path.join('src', 'app', 'v1', 'cart', 'docs.yaml'));
+
   // Merge the product-specific docs into the main OpenAPI document
-  _merge(swaggerDocument, userDocs, productDocs, categoryDocs);
+  _merge(swaggerDocument, userDocs, productDocs, categoryDocs, cartDocs);
 } catch (error) {
   console.error('Error loading or merging YAML files:', error);
 

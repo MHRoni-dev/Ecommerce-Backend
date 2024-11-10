@@ -1,0 +1,159 @@
+paths:
+  /cart/set:
+    post:
+      tags:
+        - Cart
+      summary: create and update cart items with single endpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartPayload'
+      responses:
+        '200':
+          description: Cart updated successfully
+          content: 
+            application/json:
+              Example: 
+                status: success
+                message: Cart updated successfully
+                cart:
+                  _id: 62f3e6c1b3b4b4b4b4b4b4b4
+                  userId: 62f3e6c1b3b4b4b4b4b4b4b4
+                  items: 
+                    - productId: 62f3e6c1b3b4b4b4b4b4b4b4
+                      quantity: 1
+                      price: 100
+                      total: 100
+                    - productId: 4573e6c1b3b4b4b4b4b4b4b4
+                      quantity: 4
+                      price: 80
+                      total: 320
+                  totalQuantity: 5
+                  subTotal: 420
+                  discount: 0
+                  total: 420
+                  createdAt: 2022-05-28T12:00:00.000Z
+                  updatedAt: 2022-05-28T12:00:00.000Z
+        '400':
+          description: Validation Error or Invalid Input
+          content:
+            application/json:
+              examples:
+                example01:
+                  summary: Invalid product id
+                  value:
+                    status: fail
+                    message: Invalid product id
+                example02:
+                  summary: Invalid quantity
+                  value:
+                    status: fail
+                    message: Invalid quantity
+                example03:
+                  summary: product not found
+                  value:
+                    status: fail
+                    message: Product not found
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Please login first
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+  /cart/get:
+    get:
+      tags:
+        - Cart
+      summary: get cart items
+      responses:
+        '200':
+          description: Cart found successfully
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartPayload'
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Please login first
+        '404':
+          description: Cart not found
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Cart not found
+        '500':
+          description: Server Error
+          content:
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+  
+  /cart/clear:
+    delete:
+      tags:
+        - Cart
+      summary: clear cart items
+      responses:
+        '200':
+          description: Cart cleared successfully
+          content: 
+            application/json:
+              example:
+                status: success
+                message: Cart cleared successfully
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              example:
+                  status: fail
+                  message: Please login first
+        '500':
+          description: Server Error
+          content:
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ServerError'
+
+components:
+  schemas:
+    CartPayload:
+      type: array
+      items:
+        type: object 
+        required: 
+          - productId 
+          - quantity 
+        properties:
+          productId:
+            type: string
+            description: "MongoDB ObjectId"
+            pattern: "^[a-f\\d]{24}$"
+          quantity:
+            type: number 
+            default: 1
+
+    ServerError:
+      type: object 
+      properties:
+        status: 
+          type: string
+          default: fail 
+        message: 
+          type: string
+          default: something went wrong
+  

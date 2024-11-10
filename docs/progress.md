@@ -18,7 +18,7 @@ Category routes :
     - /update/:slug
     - /delete/:slug
 
-User rouotes:
+User routes:
 
     - /register
     - /login
@@ -29,6 +29,12 @@ User rouotes:
     - /update-password
     - /udpate-profile-image
     - /update-profile-data
+
+Cart routes:
+
+    - /set
+    - /get
+    - /clear
 
 ## ToDo
 Product routes:

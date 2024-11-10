@@ -6,6 +6,7 @@ import { handleError } from '@error/index';
 import productRoutesV1 from '@app/v1/product/routes';
 import categoryRoutesV1 from '@app/v1/category/routes';
 import userRoutesV1 from '@app/v1/user/routes';
+import cartRoutesV1 from '@app/v1/cart/routes';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/docs', ...documentation);
 app.use('/api/v1/product', productRoutesV1);
 app.use('/api/v1/category', categoryRoutesV1);
 app.use('/api/v1/user', userRoutesV1);
+app.use('/api/v1/cart', cartRoutesV1);
 
 // global error Handler
 app.use(handleError);

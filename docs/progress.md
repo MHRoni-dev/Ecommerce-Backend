@@ -48,3 +48,11 @@ Category routes:
 User routes:
 
     - /verify/:email => get email form body and make the request put not get and rename route to /verify-email
+
+Order routes:
+
+    - /create
+    - /read
+    - /read/:orderId 
+    - /update/:orderId 
+    - /delete/:orderId
